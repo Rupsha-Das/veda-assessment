@@ -1,3 +1,4 @@
+this app is based on the specification provided in docs/spec.md make sure to follow it
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
