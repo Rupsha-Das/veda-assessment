@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  ArrowLeft,
-  ZoomIn,
-  ZoomOut,
-  ChevronLeft,
-  ChevronRight,
-  MoreVertical,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { ZoomLevel } from "@/types/mapping";
 
 interface AnswerToolbarProps {
@@ -22,34 +15,6 @@ interface AnswerToolbarProps {
   onBack: () => void;
 }
 
-function TBtn({
-  children,
-  onClick,
-  disabled,
-  label,
-  className,
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  disabled?: boolean;
-  label: string;
-  className?: string;
-}) {
-  return (
-    <button
-      aria-label={label}
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-        "inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-gray-100 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40",
-        className,
-      )}
-    >
-      {children}
-    </button>
-  );
-}
-
 export default function AnswerToolbar({
   zoom,
   page,
@@ -58,49 +23,61 @@ export default function AnswerToolbar({
   onZoomOut,
   onPrevPage,
   onNextPage,
-  onBack,
 }: AnswerToolbarProps) {
   return (
-    <div className="flex h-11 shrink-0 items-center gap-1 border-b border-[--color-border] bg-white px-2 sm:px-3">
-      <TBtn label="Back" onClick={onBack} className="hidden lg:inline-flex">
-        <ArrowLeft className="size-4" />
-      </TBtn>
-      <span className="text-sm font-semibold text-foreground">
-        Answer Sheet
-      </span>
-
-      <div className="ml-auto flex items-center gap-0.5">
-        <TBtn label="Zoom out" onClick={onZoomOut} disabled={zoom <= 50}>
-          <ZoomOut className="size-4" />
-        </TBtn>
-        <span className="w-10 text-center text-xs font-medium tabular-nums text-foreground">
+    <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3 py-2">
+      {/* Zoom controls */}
+      <div className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1.5">
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          onClick={onZoomOut}
+          disabled={zoom <= 50}
+          className="text-gray-700 hover:bg-gray-200"
+          aria-label="Zoom out"
+        >
+          <ZoomOut />
+        </Button>
+        <span className="min-w-[40px] text-center text-sm font-medium tabular-nums text-gray-900">
           {zoom}%
         </span>
-        <TBtn label="Zoom in" onClick={onZoomIn} disabled={zoom >= 150}>
-          <ZoomIn className="size-4" />
-        </TBtn>
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          onClick={onZoomIn}
+          disabled={zoom >= 150}
+          className="text-gray-700 hover:bg-gray-200"
+          aria-label="Zoom in"
+        >
+          <ZoomIn />
+        </Button>
+      </div>
 
-        <div className="mx-0.5 h-4 w-px bg-[--color-border]" />
-
-        <TBtn label="Previous page" onClick={onPrevPage} disabled={page <= 1}>
-          <ChevronLeft className="size-4" />
-        </TBtn>
-        <span className="whitespace-nowrap text-[11px] text-muted-foreground">
+      {/* Page navigation */}
+      <div className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1.5">
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          onClick={onPrevPage}
+          disabled={page <= 1}
+          className="text-gray-700 hover:bg-gray-200"
+          aria-label="Previous page"
+        >
+          <ChevronLeft />
+        </Button>
+        <span className="whitespace-nowrap text-sm text-gray-900">
           Page {page} of {totalPages}
         </span>
-        <TBtn
-          label="Next page"
+        <Button
+          variant="ghost"
+          size="icon-xs"
           onClick={onNextPage}
           disabled={page >= totalPages}
+          className="text-gray-700 hover:bg-gray-200"
+          aria-label="Next page"
         >
-          <ChevronRight className="size-4" />
-        </TBtn>
-
-        <div className="mx-0.5 h-4 w-px bg-[--color-border]" />
-
-        <TBtn label="More options">
-          <MoreVertical className="size-4" />
-        </TBtn>
+          <ChevronRight />
+        </Button>
       </div>
     </div>
   );

@@ -9,11 +9,9 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import QuestionPanel from "./QuestionPanel";
 import AnswerViewer from "./AnswerViewer";
-
-type MobileTab = "questions" | "answer";
 
 interface MappingWorkspaceProps {
   onBack: () => void;
@@ -24,7 +22,7 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [zoom, setZoom] = useState<ZoomLevel>(100);
   const [page, setPage] = useState(1);
-  const [mobileTab, setMobileTab] = useState<MobileTab>("questions");
+  const [mobileTab, setMobileTab] = useState<string>("questions");
 
   const highlightRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
 
@@ -88,37 +86,31 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* Mobile tab bar */}
-      <div className="flex shrink-0 items-center border-b border-[--color-border] bg-white px-3 lg:hidden">
-        <div className="flex rounded-full border border-[--color-border] bg-muted p-0.5">
-          <button
-            onClick={() => setMobileTab("questions")}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors",
-              mobileTab === "questions"
-                ? "bg-white text-foreground shadow-sm"
-                : "text-muted-foreground",
-            )}
+      {/* Mobile: Tabs-based layout */}
+      <Tabs
+        value={mobileTab}
+        onValueChange={setMobileTab}
+        className="flex min-h-0 flex-1 flex-col lg:hidden"
+      >
+        <TabsList className="mx-4 my-2 h-auto w-fit justify-start rounded-full bg-gray-200 p-1">
+          <TabsTrigger
+            value="questions"
+            className="rounded-full px-5 py-2 data-[active]:bg-[#292929] data-[active]:text-white"
           >
             Questions
-          </button>
-          <button
-            onClick={() => setMobileTab("answer")}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors",
-              mobileTab === "answer"
-                ? "bg-white text-foreground shadow-sm"
-                : "text-muted-foreground",
-            )}
+          </TabsTrigger>
+          <TabsTrigger
+            value="answer"
+            className="rounded-full px-5 py-2 data-[active]:bg-[#292929] data-[active]:text-white"
           >
             Answer Sheet
-          </button>
-        </div>
-      </div>
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Mobile: single-panel view */}
-      <div className="flex min-h-0 flex-1 flex-col lg:hidden">
-        {mobileTab === "questions" && (
+        <TabsContent
+          value="questions"
+          className="min-h-0 flex-1 overflow-hidden"
+        >
           <QuestionPanel
             selectedId={selectedId}
             expandedIds={expandedIds}
@@ -126,8 +118,9 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
             onToggleExpand={toggleExpand}
             onToggleAll={toggleAll}
           />
-        )}
-        {mobileTab === "answer" && (
+        </TabsContent>
+
+        <TabsContent value="answer" className="min-h-0 flex-1 overflow-hidden">
           <AnswerViewer
             selectedId={selectedId}
             onSelect={selectQuestion}
@@ -140,8 +133,8 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
             setHighlightRef={setHighlightRef}
             totalPages={TOTAL_PAGES}
           />
-        )}
-      </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Desktop: side-by-side resizable panels */}
       <div className="hidden min-h-0 flex-1 lg:flex">
