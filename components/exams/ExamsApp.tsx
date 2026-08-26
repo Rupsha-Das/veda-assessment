@@ -92,7 +92,7 @@ export default function ExamsApp() {
       <DashboardLayout
         sidebarCollapsed={sidebarCollapsed}
         onToggleSidebar={() => setSidebarCollapsed((v) => !v)}
-        onBack={handleBackToUpload}
+        onBack={screen === "mapping" ? handleBackToUpload : undefined}
       >
         {screen === "upload" && (
           <UploadPage

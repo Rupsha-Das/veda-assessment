@@ -21,7 +21,7 @@ export default function QuestionPanel({
   const allExpanded = expandedIds.size === mockQuestions.length;
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex shrink-0 items-center justify-between border-b border-[--color-border] px-4 py-3">
         <h2 className="text-[13px] font-semibold text-foreground">
           Extracted Questions{" "}

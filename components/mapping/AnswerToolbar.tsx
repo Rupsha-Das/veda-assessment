@@ -27,11 +27,13 @@ function TBtn({
   onClick,
   disabled,
   label,
+  className,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
   label: string;
+  className?: string;
 }) {
   return (
     <button
@@ -40,6 +42,7 @@ function TBtn({
       disabled={disabled}
       className={cn(
         "inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-gray-100 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40",
+        className,
       )}
     >
       {children}
@@ -59,7 +62,7 @@ export default function AnswerToolbar({
 }: AnswerToolbarProps) {
   return (
     <div className="flex h-11 shrink-0 items-center gap-1 border-b border-[--color-border] bg-white px-2 sm:px-3">
-      <TBtn label="Back" onClick={onBack}>
+      <TBtn label="Back" onClick={onBack} className="hidden lg:inline-flex">
         <ArrowLeft className="size-4" />
       </TBtn>
       <span className="text-sm font-semibold text-foreground">
