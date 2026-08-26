@@ -142,7 +142,7 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
       {/* Question panel - left side */}
       <div
         className={cn(
-          "flex flex-col border-r border-[--color-border] bg-white",
+          "flex min-h-0 flex-1 flex-col bg-white lg:flex-shrink-0 lg:border-r lg:border-[--color-border]",
           mobileTab === "questions" ? "flex" : "hidden lg:flex",
         )}
         style={{ width: typeof window !== "undefined" && window.innerWidth >= 1024 ? panelWidth : undefined }}
@@ -165,7 +165,7 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
       {/* Answer viewer - right side */}
       <div
         className={cn(
-          "flex flex-1 flex-col min-w-0",
+          "flex min-h-0 flex-1 flex-col",
           mobileTab === "answersheet" ? "flex" : "hidden lg:flex",
         )}
       >
