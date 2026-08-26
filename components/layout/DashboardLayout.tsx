@@ -8,12 +8,14 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
+  onBack?: () => void;
 }
 
 export default function DashboardLayout({
   children,
   sidebarCollapsed,
   onToggleSidebar,
+  onBack,
 }: DashboardLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -32,11 +34,12 @@ export default function DashboardLayout({
         mobileOpen={mobileOpen}
         onCloseMobile={() => setMobileOpen(false)}
       />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar
           sidebarCollapsed={sidebarCollapsed}
           onToggleSidebar={onToggleSidebar}
           onOpenMobileSidebar={() => setMobileOpen(true)}
+          onBack={onBack}
         />
         <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
       </div>

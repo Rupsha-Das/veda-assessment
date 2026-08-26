@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import type { MobileTab, ZoomLevel } from "@/types/mapping";
 import { ZOOM_LEVELS } from "@/types/mapping";
 import { mockQuestions } from "@/data/mockQuestions";
@@ -12,14 +12,21 @@ interface MappingWorkspaceProps {
   onBack: () => void;
 }
 
+const MIN_PANEL_W = 320;
+const MAX_PANEL_W = 600;
+const DEFAULT_PANEL_W = 420;
+
 export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
   const [selectedId, setSelectedId] = useState<number>(1);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set([2]));
   const [zoom, setZoom] = useState<ZoomLevel>(100);
   const [page, setPage] = useState(1);
   const [mobileTab, setMobileTab] = useState<MobileTab>("questions");
+  const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_W);
 
   const highlightRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+  const isDragging = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedQuestion = mockQuestions.find((q) => q.id === selectedId);
 
@@ -43,6 +50,33 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
       );
     }
   }, [selectedId, selectedQuestion, page]);
+
+  const handleDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }, []);
+
+  useEffect(() => {
+    const handleDragMove = (e: MouseEvent) => {
+      if (!isDragging.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const newWidth = e.clientX - rect.left;
+      setPanelWidth(Math.max(MIN_PANEL_W, Math.min(MAX_PANEL_W, newWidth)));
+    };
+    const handleDragEnd = () => {
+      isDragging.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    document.addEventListener("mousemove", handleDragMove);
+    document.addEventListener("mouseup", handleDragEnd);
+    return () => {
+      document.removeEventListener("mousemove", handleDragMove);
+      document.removeEventListener("mouseup", handleDragEnd);
+    };
+  }, []);
 
   const handleZoomIn = () => {
     const idx = ZOOM_LEVELS.indexOf(zoom);
@@ -84,7 +118,7 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div ref={containerRef} className="flex h-full flex-col overflow-hidden lg:flex-row">
       {/* Mobile tab bar */}
       <div className="flex shrink-0 items-center justify-center border-b border-[--color-border] bg-white px-4 py-2.5 lg:hidden">
         <div className="flex w-full max-w-[280px] gap-1 rounded-full bg-gray-100 p-1">
@@ -105,44 +139,47 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
         </div>
       </div>
 
-      {/* Content area */}
-      <div className="min-h-0 flex-1 overflow-hidden">
-        {/* Question panel - mobile: full height when active */}
-        <div
-          className={cn(
-            "h-full overflow-hidden bg-white lg:flex lg:flex-col lg:border-r lg:border-[--color-border]",
-            mobileTab === "questions" ? "flex flex-col" : "hidden lg:flex",
-            "lg:w-[380px] xl:w-[420px] lg:flex-shrink-0",
-          )}
-        >
-          <QuestionPanel
-            selectedId={selectedId}
-            expandedIds={expandedIds}
-            onSelect={selectQuestion}
-            onToggleExpand={toggleExpand}
-            onToggleAll={toggleAll}
-          />
-        </div>
+      {/* Question panel - left side */}
+      <div
+        className={cn(
+          "flex flex-col border-r border-[--color-border] bg-white",
+          mobileTab === "questions" ? "flex" : "hidden lg:flex",
+        )}
+        style={{ width: typeof window !== "undefined" && window.innerWidth >= 1024 ? panelWidth : undefined }}
+      >
+        <QuestionPanel
+          selectedId={selectedId}
+          expandedIds={expandedIds}
+          onSelect={selectQuestion}
+          onToggleExpand={toggleExpand}
+          onToggleAll={toggleAll}
+        />
+      </div>
 
-        {/* Answer viewer - mobile: full height when active */}
-        <div
-          className={cn(
-            "h-full overflow-hidden lg:flex lg:flex-col",
-            mobileTab === "answersheet" ? "flex flex-col" : "hidden lg:flex",
-          )}
-        >
-          <AnswerViewer
-            selectedId={selectedId}
-            onSelect={selectQuestion}
-            zoom={zoom}
-            page={page}
-            setPage={setPage}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onBack={onBack}
-            setHighlightRef={setHighlightRef}
-          />
-        </div>
+      {/* Draggable divider - desktop only */}
+      <div
+        onMouseDown={handleDragStart}
+        className="hidden w-1 cursor-col-resize bg-[--color-border] transition-colors hover:bg-[--color-veda-orange] lg:block"
+      />
+
+      {/* Answer viewer - right side */}
+      <div
+        className={cn(
+          "flex flex-1 flex-col min-w-0",
+          mobileTab === "answersheet" ? "flex" : "hidden lg:flex",
+        )}
+      >
+        <AnswerViewer
+          selectedId={selectedId}
+          onSelect={selectQuestion}
+          zoom={zoom}
+          page={page}
+          setPage={setPage}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onBack={onBack}
+          setHighlightRef={setHighlightRef}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { TOTAL_PAGES } from "@/types/mapping";
 import AnswerToolbar from "./AnswerToolbar";
 import AnswerHighlight from "./AnswerHighlight";
@@ -34,7 +34,19 @@ export default function AnswerViewer({
   onBack,
   setHighlightRef,
 }: AnswerViewerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
   const z = zoom / 100;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(([entry]) => {
+      setContainerWidth(entry.contentRect.width);
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const highlightsOnPage = useMemo(
     () =>
@@ -46,8 +58,17 @@ export default function AnswerViewer({
 
   const hasSelection = selectedId !== null;
 
+  // Responsive scaling
+  const isMobile = containerWidth > 0 && containerWidth < 640;
+  const padding = isMobile ? 16 : 40;
+  const availableWidth = containerWidth - padding;
+  const fitScale = availableWidth > 0 ? availableWidth / BASE_W : 1;
+  const effectiveScale = isMobile ? Math.min(fitScale, z) : z;
+  const paperW = isMobile ? BASE_W * effectiveScale : BASE_W * z;
+  const paperH = isMobile ? BASE_H * effectiveScale : BASE_H * z;
+
   return (
-    <div className="flex h-full flex-col bg-[#efefef]">
+    <div ref={containerRef} className="flex h-full flex-col bg-[#efefef]">
       <AnswerToolbar
         zoom={zoom}
         page={page}
@@ -58,13 +79,16 @@ export default function AnswerViewer({
         onBack={onBack}
       />
 
-      <div className="min-h-0 flex-1 overflow-auto p-3 sm:p-5">
-        <div className="mx-auto" style={{ width: BASE_W * z, height: BASE_H * z }}>
+      <div className="min-h-0 flex-1 overflow-auto p-2 sm:p-4 md:p-6">
+        <div
+          className="mx-auto"
+          style={{ width: paperW, height: paperH }}
+        >
           <div
             style={{
               width: BASE_W,
               height: BASE_H,
-              transform: `scale(${z})`,
+              transform: `scale(${effectiveScale})`,
               transformOrigin: "top left",
             }}
             className="relative"

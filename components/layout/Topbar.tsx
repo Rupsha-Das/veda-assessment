@@ -17,6 +17,7 @@ interface TopbarProps {
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
   onOpenMobileSidebar: () => void;
+  onBack?: () => void;
 }
 
 function IconBtn({
@@ -48,6 +49,7 @@ export default function Topbar({
   sidebarCollapsed,
   onToggleSidebar,
   onOpenMobileSidebar,
+  onBack,
 }: TopbarProps) {
   return (
     <header className="flex h-[52px] shrink-0 items-center gap-1 border-b border-[--color-border] bg-white px-3 sm:h-[60px]">
@@ -66,7 +68,7 @@ export default function Topbar({
           <PanelLeftClose className="size-5" />
         )}
       </IconBtn>
-      <IconBtn label="Back" className="hidden lg:inline-flex">
+      <IconBtn label="Back" onClick={onBack} className="hidden lg:inline-flex">
         <ChevronLeft className="size-5" />
       </IconBtn>
       <div className="hidden items-center gap-1.5 text-sm font-medium text-foreground lg:flex">
