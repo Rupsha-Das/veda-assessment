@@ -117,6 +117,7 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
             onSelect={handleMobileTabSelect}
             onToggleExpand={toggleExpand}
             onToggleAll={toggleAll}
+            onBack={onBack}
           />
         </TabsContent>
 
@@ -154,6 +155,7 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
               onSelect={selectQuestion}
               onToggleExpand={toggleExpand}
               onToggleAll={toggleAll}
+              onBack={onBack}
             />
           </ResizablePanel>
 

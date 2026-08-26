@@ -1,6 +1,6 @@
 "use client";
 
-import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { ZoomIn, ZoomOut, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ZoomLevel } from "@/types/mapping";
 
@@ -23,9 +23,20 @@ export default function AnswerToolbar({
   onZoomOut,
   onPrevPage,
   onNextPage,
+  onBack,
 }: AnswerToolbarProps) {
   return (
     <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3 py-2">
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        onClick={onBack}
+        className="text-gray-700 hover:bg-gray-200"
+        aria-label="Back to submission"
+      >
+        <ArrowLeft />
+      </Button>
+
       {/* Zoom controls */}
       <div className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1.5">
         <Button

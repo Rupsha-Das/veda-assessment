@@ -1,6 +1,9 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
 import { mockQuestions } from "@/data/mockQuestions";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import QuestionCard from "./QuestionCard";
 
 interface QuestionPanelProps {
@@ -9,6 +12,7 @@ interface QuestionPanelProps {
   onSelect: (id: number) => void;
   onToggleExpand: (id: number) => void;
   onToggleAll: () => void;
+  onBack?: () => void;
 }
 
 export default function QuestionPanel({
@@ -17,18 +21,33 @@ export default function QuestionPanel({
   onSelect,
   onToggleExpand,
   onToggleAll,
+  onBack,
 }: QuestionPanelProps) {
   const allExpanded = expandedIds.size === mockQuestions.length;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="flex shrink-0 items-center justify-between border-b border-[--color-border] px-4 py-3">
-        <h2 className="text-[13px] font-semibold text-foreground">
-          Extracted Questions{" "}
-          <span className="font-normal text-muted-foreground">
-            (from question paper)
-          </span>
-        </h2>
+        <div className="flex items-center gap-2">
+          {onBack && (
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={onBack}
+              title="Back to submission"
+              className="rounded-lg p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Back to submission"
+            >
+              <ArrowLeft />
+            </Button>
+          )}
+          <h2 className="text-[13px] font-semibold text-foreground">
+            Extracted Questions{" "}
+            <span className="font-normal text-muted-foreground">
+              (from question paper)
+            </span>
+          </h2>
+        </div>
         <button
           onClick={onToggleAll}
           className="rounded-lg border border-[--color-border] px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
@@ -36,7 +55,7 @@ export default function QuestionPanel({
           {allExpanded ? "Collapse All" : "Expand All"}
         </button>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
+      <ScrollArea className="min-h-0 flex-1 p-3">
         <div className="flex flex-col gap-2">
           {mockQuestions.map((q) => (
             <QuestionCard
@@ -49,7 +68,7 @@ export default function QuestionPanel({
             />
           ))}
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 }
