@@ -1,15 +1,14 @@
 "use client";
 
-import { useMemo, useRef, useEffect, useState } from "react";
-import { TOTAL_PAGES } from "@/types/mapping";
+import { useRef, useEffect, useState, useMemo } from "react";
+import { mockQuestions } from "@/data/mockQuestions";
+import type { ZoomLevel } from "@/types/mapping";
 import AnswerToolbar from "./AnswerToolbar";
 import AnswerHighlight from "./AnswerHighlight";
 import AnswerSheetPage from "./AnswerSheetPage";
-import { mockQuestions } from "@/data/mockQuestions";
-import type { ZoomLevel } from "@/types/mapping";
 
 interface AnswerViewerProps {
-  selectedId: number;
+  selectedId: number | null;
   onSelect: (id: number) => void;
   zoom: ZoomLevel;
   page: number;
@@ -18,6 +17,7 @@ interface AnswerViewerProps {
   onZoomOut: () => void;
   onBack: () => void;
   setHighlightRef: (id: number, el: HTMLButtonElement | null) => void;
+  totalPages: number;
 }
 
 const BASE_W = 580;
@@ -33,6 +33,7 @@ export default function AnswerViewer({
   onZoomOut,
   onBack,
   setHighlightRef,
+  totalPages,
 }: AnswerViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -58,7 +59,6 @@ export default function AnswerViewer({
 
   const hasSelection = selectedId !== null;
 
-  // Responsive scaling
   const isMobile = containerWidth > 0 && containerWidth < 640;
   const padding = isMobile ? 16 : 40;
   const availableWidth = containerWidth - padding;
@@ -72,18 +72,16 @@ export default function AnswerViewer({
       <AnswerToolbar
         zoom={zoom}
         page={page}
+        totalPages={totalPages}
         onZoomIn={onZoomIn}
         onZoomOut={onZoomOut}
         onPrevPage={() => setPage(Math.max(1, page - 1))}
-        onNextPage={() => setPage(Math.min(TOTAL_PAGES, page + 1))}
+        onNextPage={() => setPage(Math.min(totalPages, page + 1))}
         onBack={onBack}
       />
 
       <div className="min-h-0 flex-1 overflow-auto p-2 sm:p-4 md:p-6">
-        <div
-          className="mx-auto"
-          style={{ width: paperW, height: paperH }}
-        >
+        <div className="mx-auto" style={{ width: paperW, height: paperH }}>
           <div
             style={{
               width: BASE_W,

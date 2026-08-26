@@ -7,8 +7,8 @@ export const mockQuestions: MockQuestion[] = [
     status: "mapped",
     confidence: 95,
     score: "2/2",
-    answerExcerpt: "Arteries carry oxygenated blood away from the heart to various body parts.",
-    answerRegion: { page: 1, x: 6, y: 5, width: 88, height: 14 },
+    answerExcerpt: "Arteries carry oxygenated blood away from the heart.",
+    answerRegion: { page: 1, x: 5, y: 3, width: 90, height: 22 },
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ export const mockQuestions: MockQuestion[] = [
       "Excellent work! You correctly identified the chloroplast as the organelle responsible for photosynthesis. Keep it up!",
     answerExcerpt:
       "Chloroplast is the organelle primarily involved in photosynthesis.",
-    answerRegion: { page: 1, x: 6, y: 22, width: 88, height: 20 },
+    answerRegion: { page: 1, x: 5, y: 27, width: 90, height: 22 },
   },
   {
     id: 3,
@@ -32,7 +32,7 @@ export const mockQuestions: MockQuestion[] = [
     score: "2/2",
     answerExcerpt:
       "Chloroplasts contain chlorophyll which absorbs light energy. The two stages are light-dependent reactions and the Calvin cycle.",
-    answerRegion: { page: 1, x: 6, y: 45, width: 88, height: 14 },
+    answerRegion: { page: 1, x: 5, y: 51, width: 90, height: 20 },
   },
   {
     id: 4,
@@ -41,7 +41,6 @@ export const mockQuestions: MockQuestion[] = [
     status: "unmapped",
     confidence: 0,
     score: "0/2",
-    answerRegion: undefined,
   },
   {
     id: 5,
@@ -51,7 +50,7 @@ export const mockQuestions: MockQuestion[] = [
     confidence: 90,
     score: "2/2",
     answerExcerpt: "[Diagram present on answer sheet]",
-    answerRegion: { page: 2, x: 6, y: 5, width: 88, height: 18 },
+    answerRegion: { page: 2, x: 5, y: 3, width: 90, height: 22 },
   },
   {
     id: 6,
@@ -63,7 +62,7 @@ export const mockQuestions: MockQuestion[] = [
     feedback:
       "Good diagram overall. The labelling of the large intestine and the site of absorption could be more precise. Consider adding the duodenum label.",
     answerExcerpt: "[Diagram present on answer sheet]",
-    answerRegion: { page: 2, x: 6, y: 26, width: 88, height: 22 },
+    answerRegion: { page: 2, x: 5, y: 27, width: 90, height: 22 },
   },
   {
     id: 7,
@@ -73,7 +72,7 @@ export const mockQuestions: MockQuestion[] = [
     confidence: 94,
     score: "5/5",
     answerExcerpt: "[Diagram present on answer sheet]",
-    answerRegion: { page: 2, x: 6, y: 51, width: 88, height: 20 },
+    answerRegion: { page: 2, x: 5, y: 51, width: 90, height: 20 },
   },
   {
     id: 8,
@@ -86,7 +85,7 @@ export const mockQuestions: MockQuestion[] = [
       "The student correctly describes palisade cells as vertically elongated. However, the spongy mesophyll description lacks detail about air spaces and their role in gas exchange.",
     answerExcerpt:
       "Palisade mesophyll: column-shaped cells packed with chloroplasts. Spongy mesophyll: loosely arranged with air spaces.",
-    answerRegion: { page: 3, x: 6, y: 5, width: 88, height: 16 },
+    answerRegion: { page: 3, x: 5, y: 3, width: 90, height: 20 },
   },
   {
     id: 9,
@@ -97,7 +96,7 @@ export const mockQuestions: MockQuestion[] = [
     score: "5/5",
     answerExcerpt:
       "Transpiration is the loss of water vapour from leaves through stomata. Factors: high temperature, wind, low humidity.",
-    answerRegion: { page: 3, x: 6, y: 24, width: 88, height: 14 },
+    answerRegion: { page: 3, x: 5, y: 25, width: 90, height: 20 },
   },
   {
     id: 10,
@@ -110,18 +109,18 @@ export const mockQuestions: MockQuestion[] = [
       "Good mention of lignified walls. Could also mention the narrow lumen that helps in capillary action and the dead cells that allow unobstructed flow.",
     answerExcerpt:
       "Xylem vessels have lignified walls that provide mechanical support and prevent collapse under tension.",
-    answerRegion: { page: 3, x: 6, y: 41, width: 88, height: 14 },
+    answerRegion: { page: 3, x: 5, y: 47, width: 90, height: 20 },
   },
   {
     id: 11,
     question:
-      "A diagram shows two potted plants — Plant A in bright light with green leaves, Plant B kept in dim light with pale, elongated leaves.",
+      "A diagram shows two potted plants \u2014 Plant A in bright light with green leaves, Plant B kept in dim light with pale, elongated leaves.",
     status: "mapped",
     confidence: 91,
     score: "2/2",
     answerExcerpt:
       "Plant B shows etiolation due to lack of light for chlorophyll synthesis.",
-    answerRegion: { page: 3, x: 6, y: 58, width: 88, height: 14 },
+    answerRegion: { page: 3, x: 5, y: 69, width: 90, height: 18 },
   },
   {
     id: 12,
@@ -131,14 +130,21 @@ export const mockQuestions: MockQuestion[] = [
     confidence: 75,
     score: "4/5",
     feedback:
-      "The calculation is mostly correct. The student should explicitly state the formula: TV × RR = Minute ventilation.",
-    answerExcerpt: "Minute ventilation = 0.5 × 12 = 6 L/min",
-    answerRegion: { page: 4, x: 6, y: 5, width: 88, height: 14 },
+      "The calculation is mostly correct. The student should explicitly state the formula: TV x RR = Minute ventilation.",
+    answerExcerpt: "Minute ventilation = 0.5 x 12 = 6 L/min",
+    answerRegion: { page: 4, x: 5, y: 3, width: 90, height: 20 },
   },
 ];
 
-export function getTotalMappedQuestions(): number {
-  return mockQuestions.filter(
-    (q) => q.status === "mapped" || q.status === "review",
-  ).length;
+export function getTotalScore(): string {
+  let earned = 0;
+  let total = 0;
+  for (const q of mockQuestions) {
+    if (q.score) {
+      const [e, t] = q.score.split("/").map(Number);
+      earned += e;
+      total += t;
+    }
+  }
+  return `${earned}/${total}`;
 }

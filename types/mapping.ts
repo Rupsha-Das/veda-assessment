@@ -1,7 +1,5 @@
 export type Screen = "upload" | "loading" | "mapping";
 
-export type MobileTab = "questions" | "answersheet";
-
 export type QuestionStatus = "mapped" | "review" | "unmapped";
 
 export interface UploadedFileMeta {
@@ -32,4 +30,4 @@ export interface MockQuestion {
 export type ZoomLevel = 50 | 75 | 100 | 125 | 150;
 
 export const ZOOM_LEVELS: ZoomLevel[] = [50, 75, 100, 125, 150];
-export const TOTAL_PAGES = 6;
+export const TOTAL_PAGES = 4;

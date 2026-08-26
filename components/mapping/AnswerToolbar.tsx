@@ -10,11 +10,11 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ZoomLevel } from "@/types/mapping";
-import { TOTAL_PAGES } from "@/types/mapping";
 
 interface AnswerToolbarProps {
   zoom: ZoomLevel;
   page: number;
+  totalPages: number;
   onZoomIn: () => void;
   onZoomOut: () => void;
   onPrevPage: () => void;
@@ -27,13 +27,11 @@ function TBtn({
   onClick,
   disabled,
   label,
-  className,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
   label: string;
-  className?: string;
 }) {
   return (
     <button
@@ -42,7 +40,6 @@ function TBtn({
       disabled={disabled}
       className={cn(
         "inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-gray-100 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40",
-        className,
       )}
     >
       {children}
@@ -53,6 +50,7 @@ function TBtn({
 export default function AnswerToolbar({
   zoom,
   page,
+  totalPages,
   onZoomIn,
   onZoomOut,
   onPrevPage,
@@ -85,12 +83,12 @@ export default function AnswerToolbar({
           <ChevronLeft className="size-4" />
         </TBtn>
         <span className="whitespace-nowrap text-[11px] text-muted-foreground">
-          Page {page} of {TOTAL_PAGES}
+          Page {page} of {totalPages}
         </span>
         <TBtn
           label="Next page"
           onClick={onNextPage}
-          disabled={page >= TOTAL_PAGES}
+          disabled={page >= totalPages}
         >
           <ChevronRight className="size-4" />
         </TBtn>

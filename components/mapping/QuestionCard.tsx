@@ -24,18 +24,18 @@ export default function QuestionCard({
 
   return (
     <div
+      onClick={onSelect}
       className={cn(
-        "rounded-2xl border bg-white transition-all duration-150",
+        "cursor-pointer rounded-2xl border bg-white transition-all duration-150",
         isSelected
           ? "border-[--color-veda-orange] shadow-sm"
           : "border-[--color-border] hover:border-gray-300 hover:shadow-sm",
       )}
     >
-      <div className="flex items-start gap-3 p-3 sm:p-3.5">
-        {/* Numbered badge */}
+      <div className="flex items-start gap-3 p-3">
         <div
           className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:size-8",
+            "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold",
             isSelected
               ? "bg-[--color-veda-orange] text-white"
               : "bg-[--color-veda-dark] text-white",
@@ -44,14 +44,12 @@ export default function QuestionCard({
           {question.id}
         </div>
 
-        {/* Question content */}
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-medium leading-snug text-foreground">
             {question.question}
           </p>
         </div>
 
-        {/* Score / expand */}
         <div className="flex shrink-0 flex-col items-end gap-1">
           {question.score && (
             <span
@@ -69,7 +67,6 @@ export default function QuestionCard({
               onToggleExpand();
             }}
             aria-expanded={isExpanded}
-            aria-label={isExpanded ? "Collapse question" : "Expand question"}
             className="inline-flex size-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-gray-100"
           >
             <ChevronDown
@@ -83,7 +80,7 @@ export default function QuestionCard({
       </div>
 
       {isExpanded && (
-        <div className="animate-fade-in border-t border-[--color-border] px-3 pb-3 pt-3 sm:px-3.5 sm:pb-3.5">
+        <div className="animate-fade-in border-t border-[--color-border] px-3 pb-3 pt-3">
           {question.status === "review" && question.feedback && (
             <div className="rounded-xl border border-orange-200 bg-[--color-veda-orange-soft] p-3">
               <p className="mb-1 text-xs font-bold text-[--color-veda-orange]">

@@ -4,7 +4,7 @@ import { mockQuestions } from "@/data/mockQuestions";
 import QuestionCard from "./QuestionCard";
 
 interface QuestionPanelProps {
-  selectedId: number;
+  selectedId: number | null;
   expandedIds: Set<number>;
   onSelect: (id: number) => void;
   onToggleExpand: (id: number) => void;
@@ -23,7 +23,7 @@ export default function QuestionPanel({
   return (
     <div className="flex h-full flex-col">
       <div className="flex shrink-0 items-center justify-between border-b border-[--color-border] px-4 py-3">
-        <h2 className="text-[13px] font-semibold leading-snug text-foreground">
+        <h2 className="text-[13px] font-semibold text-foreground">
           Extracted Questions{" "}
           <span className="font-normal text-muted-foreground">
             (from question paper)
@@ -31,13 +31,13 @@ export default function QuestionPanel({
         </h2>
         <button
           onClick={onToggleAll}
-          className="shrink-0 rounded-lg border border-[--color-border] px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="rounded-lg border border-[--color-border] px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
           {allExpanded ? "Collapse All" : "Expand All"}
         </button>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2">
           {mockQuestions.map((q) => (
             <QuestionCard
               key={q.id}

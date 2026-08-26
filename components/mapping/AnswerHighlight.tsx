@@ -32,10 +32,18 @@ export default function AnswerHighlight({
       className={cn(
         "absolute rounded-md border-2 transition-all duration-200",
         isSelected && "ring-2 ring-offset-0 z-10",
-        status === "mapped" && !isSelected && "border-emerald-500/60 bg-emerald-400/20",
-        status === "review" && !isSelected && "border-orange-500/60 bg-orange-400/20",
-        isSelected && status === "mapped" && "border-emerald-500 bg-emerald-400/35 ring-emerald-500/30",
-        isSelected && status === "review" && "border-orange-500 bg-orange-400/35 ring-orange-500/30",
+        status === "mapped" &&
+          !isSelected &&
+          "border-emerald-500/60 bg-emerald-400/20",
+        status === "review" &&
+          !isSelected &&
+          "border-orange-500/60 bg-orange-400/20",
+        isSelected &&
+          status === "mapped" &&
+          "border-emerald-500 bg-emerald-400/35 ring-emerald-500/30",
+        isSelected &&
+          status === "review" &&
+          "border-orange-500 bg-orange-400/35 ring-orange-500/30",
         hasSelection && !isSelected && "opacity-35",
       )}
       style={{
