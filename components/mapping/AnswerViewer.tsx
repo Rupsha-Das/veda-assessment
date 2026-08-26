@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { cn } from "@/lib/utils";
 import { TOTAL_PAGES } from "@/types/mapping";
 import AnswerToolbar from "./AnswerToolbar";
 import AnswerHighlight from "./AnswerHighlight";
@@ -21,7 +20,7 @@ interface AnswerViewerProps {
   setHighlightRef: (id: number, el: HTMLButtonElement | null) => void;
 }
 
-const BASE_W = 620;
+const BASE_W = 580;
 const BASE_H = Math.round(BASE_W * 1.414);
 
 export default function AnswerViewer({
@@ -59,14 +58,8 @@ export default function AnswerViewer({
         onBack={onBack}
       />
 
-      <div className="flex-1 overflow-auto p-4 sm:p-6">
-        <div
-          className="mx-auto"
-          style={{
-            width: BASE_W * z,
-            height: BASE_H * z,
-          }}
-        >
+      <div className="min-h-0 flex-1 overflow-auto p-3 sm:p-5">
+        <div className="mx-auto" style={{ width: BASE_W * z, height: BASE_H * z }}>
           <div
             style={{
               width: BASE_W,

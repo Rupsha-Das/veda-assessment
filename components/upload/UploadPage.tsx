@@ -53,7 +53,14 @@ export default function UploadPage({
         <div className="grid w-full max-w-[540px] grid-cols-1 gap-4 sm:grid-cols-2">
           <FileUploadCard
             kind="question"
-            label="Upload Question Paper"
+            label={
+              <>
+                Upload{" "}
+                <span className="text-[--color-veda-orange]">
+                  Question Paper
+                </span>
+              </>
+            }
             file={questionPaper}
             error={questionError}
             onFileSelected={(f) => handleUpload("question", f)}
@@ -62,7 +69,12 @@ export default function UploadPage({
           />
           <FileUploadCard
             kind="answer"
-            label="Upload Answer Sheet"
+            label={
+              <>
+                Upload{" "}
+                <span className="text-[--color-veda-orange]">Answer Sheet</span>
+              </>
+            }
             file={answerSheet}
             error={answerError}
             onFileSelected={(f) => handleUpload("answer", f)}

@@ -19,7 +19,8 @@ export default function QuestionCard({
   onSelect,
   onToggleExpand,
 }: QuestionCardProps) {
-  const hasScore = question.score && question.score !== "0/2" && question.score !== "0/5";
+  const hasScore =
+    question.score && question.score !== "0/2" && question.score !== "0/5";
 
   return (
     <div
@@ -30,11 +31,11 @@ export default function QuestionCard({
           : "border-[--color-border] hover:border-gray-300 hover:shadow-sm",
       )}
     >
-      <div className="flex items-start gap-3 p-3.5">
+      <div className="flex items-start gap-3 p-3 sm:p-3.5">
         {/* Numbered badge */}
         <div
           className={cn(
-            "flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+            "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:size-8",
             isSelected
               ? "bg-[--color-veda-orange] text-white"
               : "bg-[--color-veda-dark] text-white",
@@ -82,7 +83,7 @@ export default function QuestionCard({
       </div>
 
       {isExpanded && (
-        <div className="animate-fade-in border-t border-[--color-border] px-3.5 pb-3.5 pt-3">
+        <div className="animate-fade-in border-t border-[--color-border] px-3 pb-3 pt-3 sm:px-3.5 sm:pb-3.5">
           {question.status === "review" && question.feedback && (
             <div className="rounded-xl border border-orange-200 bg-[--color-veda-orange-soft] p-3">
               <p className="mb-1 text-xs font-bold text-[--color-veda-orange]">

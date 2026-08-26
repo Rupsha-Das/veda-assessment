@@ -21,11 +21,10 @@ export default function QuestionPanel({
   const allExpanded = expandedIds.size === mockQuestions.length;
 
   return (
-    <>
-      <div className="flex items-center justify-between border-b border-[--color-border] px-4 py-3">
+    <div className="flex h-full flex-col">
+      <div className="flex shrink-0 items-center justify-between border-b border-[--color-border] px-4 py-3">
         <h2 className="text-[13px] font-semibold leading-snug text-foreground">
-          Extracted Questions
-          <br />
+          Extracted Questions{" "}
           <span className="font-normal text-muted-foreground">
             (from question paper)
           </span>
@@ -37,8 +36,8 @@ export default function QuestionPanel({
           {allExpanded ? "Collapse All" : "Expand All"}
         </button>
       </div>
-      <div className="flex-1 overflow-y-auto p-3">
-        <div className="flex flex-col gap-2">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
+        <div className="flex flex-col gap-2.5">
           {mockQuestions.map((q) => (
             <QuestionCard
               key={q.id}
@@ -51,6 +50,6 @@ export default function QuestionPanel({
           ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }

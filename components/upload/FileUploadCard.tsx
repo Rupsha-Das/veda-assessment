@@ -7,7 +7,7 @@ import type { UploadedFileMeta } from "@/types/mapping";
 
 interface FileUploadCardProps {
   kind: "question" | "answer";
-  label: string;
+  label: React.ReactNode;
   file: UploadedFileMeta | null;
   error: string | null;
   onFileSelected: (file: UploadedFileMeta) => void;
@@ -121,7 +121,7 @@ export default function FileUploadCard({
             type="file"
             accept=".pdf,application/pdf"
             className="sr-only"
-            aria-label={label}
+            aria-label={kind === "question" ? "Upload Question Paper" : "Upload Answer Sheet"}
             onChange={(e) => {
               handleFiles(e.target.files ?? []);
               e.target.value = "";
@@ -132,6 +132,7 @@ export default function FileUploadCard({
           </div>
           <div className="text-center">
             <p className="text-sm font-medium text-foreground">{label}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Max 10MB</p>
           </div>
         </label>
       )}

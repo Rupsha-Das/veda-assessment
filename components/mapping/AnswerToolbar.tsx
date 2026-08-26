@@ -60,7 +60,7 @@ export default function AnswerToolbar({
   onBack,
 }: AnswerToolbarProps) {
   return (
-    <div className="flex h-12 shrink-0 items-center gap-2 border-b border-[--color-border] bg-white px-3">
+    <div className="flex h-11 shrink-0 items-center gap-1 border-b border-[--color-border] bg-white px-2 sm:px-3">
       <TBtn label="Back" onClick={onBack}>
         <ArrowLeft className="size-4" />
       </TBtn>
@@ -68,7 +68,7 @@ export default function AnswerToolbar({
         Answer Sheet
       </span>
 
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex items-center gap-0.5">
         <TBtn label="Zoom out" onClick={onZoomOut} disabled={zoom <= 50}>
           <ZoomOut className="size-4" />
         </TBtn>
@@ -79,12 +79,12 @@ export default function AnswerToolbar({
           <ZoomIn className="size-4" />
         </TBtn>
 
-        <div className="mx-1 h-4 w-px bg-[--color-border]" />
+        <div className="mx-0.5 h-4 w-px bg-[--color-border]" />
 
         <TBtn label="Previous page" onClick={onPrevPage} disabled={page <= 1}>
           <ChevronLeft className="size-4" />
         </TBtn>
-        <span className="whitespace-nowrap text-xs text-muted-foreground">
+        <span className="whitespace-nowrap text-[11px] text-muted-foreground">
           Page {page} of {TOTAL_PAGES}
         </span>
         <TBtn
@@ -95,7 +95,7 @@ export default function AnswerToolbar({
           <ChevronRight className="size-4" />
         </TBtn>
 
-        <div className="mx-1 h-4 w-px bg-[--color-border]" />
+        <div className="mx-0.5 h-4 w-px bg-[--color-border]" />
 
         <TBtn label="More options">
           <MoreVertical className="size-4" />

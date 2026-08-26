@@ -20,7 +20,7 @@ export default function StartMappingButton({
         "group inline-flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold transition-all",
         disabled
           ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-          : "bg-[--color-veda-dark] text-white hover:bg-black hover:shadow-lg active:scale-[0.98]",
+          : "bg-black text-white hover:bg-gray-900 hover:shadow-lg active:scale-[0.98]",
       )}
     >
       Start Mapping

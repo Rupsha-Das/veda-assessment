@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Caveat } from "next/font/google";
+import { DM_Sans, Caveat } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
+const inter = DM_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],

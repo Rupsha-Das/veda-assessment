@@ -81,20 +81,19 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
       if (prev.has(id)) return prev;
       return new Set(prev).add(id);
     });
-    setMobileTab("answersheet");
   };
 
   return (
-    <div className="flex h-full flex-col lg:flex-row">
+    <div className="flex h-full flex-col overflow-hidden">
       {/* Mobile tab bar */}
-      <div className="flex items-center justify-center gap-1 border-b border-[--color-border] bg-white px-4 py-3 lg:hidden">
-        <div className="flex w-full max-w-xs gap-1 rounded-full bg-gray-100 p-1">
+      <div className="flex shrink-0 items-center justify-center border-b border-[--color-border] bg-white px-4 py-2.5 lg:hidden">
+        <div className="flex w-full max-w-[280px] gap-1 rounded-full bg-gray-100 p-1">
           {(["questions", "answersheet"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setMobileTab(tab)}
               className={cn(
-                "flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-all",
+                "flex-1 rounded-full px-4 py-2 text-sm font-medium transition-all",
                 mobileTab === tab
                   ? "bg-white text-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground",
@@ -106,41 +105,44 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
         </div>
       </div>
 
-      {/* Question panel */}
-      <div
-        className={cn(
-          "border-r border-[--color-border] bg-white transition-all lg:flex lg:flex-col",
-          mobileTab === "questions" ? "flex flex-col" : "hidden",
-          "lg:w-[380px] xl:w-[420px] lg:max-h-full lg:h-full h-[55%] lg:flex-shrink-0",
-        )}
-      >
-        <QuestionPanel
-          selectedId={selectedId}
-          expandedIds={expandedIds}
-          onSelect={selectQuestion}
-          onToggleExpand={toggleExpand}
-          onToggleAll={toggleAll}
-        />
-      </div>
+      {/* Content area */}
+      <div className="min-h-0 flex-1 overflow-hidden">
+        {/* Question panel - mobile: full height when active */}
+        <div
+          className={cn(
+            "h-full overflow-hidden bg-white lg:flex lg:flex-col lg:border-r lg:border-[--color-border]",
+            mobileTab === "questions" ? "flex flex-col" : "hidden lg:flex",
+            "lg:w-[380px] xl:w-[420px] lg:flex-shrink-0",
+          )}
+        >
+          <QuestionPanel
+            selectedId={selectedId}
+            expandedIds={expandedIds}
+            onSelect={selectQuestion}
+            onToggleExpand={toggleExpand}
+            onToggleAll={toggleAll}
+          />
+        </div>
 
-      {/* Answer viewer */}
-      <div
-        className={cn(
-          "min-h-0 flex-1 lg:flex",
-          mobileTab === "answersheet" ? "flex flex-col" : "hidden",
-        )}
-      >
-        <AnswerViewer
-          selectedId={selectedId}
-          onSelect={selectQuestion}
-          zoom={zoom}
-          page={page}
-          setPage={setPage}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
-          onBack={onBack}
-          setHighlightRef={setHighlightRef}
-        />
+        {/* Answer viewer - mobile: full height when active */}
+        <div
+          className={cn(
+            "h-full overflow-hidden lg:flex lg:flex-col",
+            mobileTab === "answersheet" ? "flex flex-col" : "hidden lg:flex",
+          )}
+        >
+          <AnswerViewer
+            selectedId={selectedId}
+            onSelect={selectQuestion}
+            zoom={zoom}
+            page={page}
+            setPage={setPage}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onBack={onBack}
+            setHighlightRef={setHighlightRef}
+          />
+        </div>
       </div>
     </div>
   );
