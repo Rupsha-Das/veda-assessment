@@ -36,22 +36,22 @@ export default function UploadPage({
   );
 
   return (
-    <div className="flex min-h-full flex-col items-center px-4 py-4 md:py-6">
-      <h1 className="text-center text-2xl font-bold tracking-tight text-foreground md:text-[32px]">
+    <div className="flex min-h-full flex-col items-center px-4 py-2 md:py-3">
+      <h1 className="text-center text-2xl font-bold tracking-tight text-foreground md:text-[28px]">
         Upload{" "}
         <span className="text-[--color-veda-orange]">
           Question Paper &amp; Answer Sheets
         </span>
       </h1>
-      <p className="mt-2 text-center text-sm text-muted-foreground">
+      <p className="mt-1 text-center text-sm text-muted-foreground">
         Upload both files to get started
       </p>
 
-      <div className="my-3 md:my-4">
+      <div className="my-2 md:my-3">
         <TeacherIllustration />
       </div>
 
-      <div className="grid w-full max-w-[540px] grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid w-full max-w-[540px] grid-cols-1 gap-3 sm:grid-cols-2">
         <FileUploadCard
           kind="question"
           label={
@@ -84,7 +84,7 @@ export default function UploadPage({
         />
       </div>
 
-      <div className="mt-8 flex flex-col items-center gap-3">
+      <div className="mt-4 flex flex-col items-center gap-2">
         <StartMappingButton
           disabled={!bothUploaded}
           onClick={onStartMapping}
