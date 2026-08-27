@@ -48,16 +48,6 @@ export default function Topbar({
         {sidebarCollapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
       </Button>
 
-      {/* VedaAI branding */}
-      <div className="flex items-center gap-2">
-        <Avatar size="sm" className="bg-white">
-          <AvatarFallback className="bg-white text-[#292929] text-xs font-bold">
-            V
-          </AvatarFallback>
-        </Avatar>
-        <span className="text-base font-bold text-white">VedaAI</span>
-      </div>
-
       {/* Right side */}
       <div className="ml-auto flex items-center gap-1">
         <Button
