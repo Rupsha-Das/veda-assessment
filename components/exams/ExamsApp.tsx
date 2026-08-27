@@ -7,6 +7,11 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import UploadPage from "@/components/upload/UploadPage";
 import ExtractionLoader from "@/components/loading/ExtractionLoader";
 import MappingWorkspace from "@/components/mapping/MappingWorkspace";
+import {
+  clearExamSession,
+  loadExamSession,
+  saveExamSession,
+} from "@/lib/exam/examSession";
 
 export default function ExamsApp() {
   const [screen, setScreen] = useState<"upload" | "loading" | "mapping">("upload");
@@ -21,8 +26,33 @@ export default function ExamsApp() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHydrated(true);
+    let mounted = true;
+
+    const restoreSession = async () => {
+      try {
+        const session = await loadExamSession();
+        if (!mounted) return;
+
+        if (session) {
+          setQuestionPaper(session.questionPaper);
+          setAnswerSheet(session.answerSheet);
+          setQuestionFile(session.questionFile);
+          setAnswerFile(session.answerFile);
+          setExamData(session.examData);
+          setAnswerSheetUrl(URL.createObjectURL(session.answerFile));
+          setScreen("mapping");
+        }
+      } catch {
+        // A storage failure should not prevent a new upload from working.
+      } finally {
+        if (mounted) setHydrated(true);
+      }
+    };
+
+    void restoreSession();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -86,6 +116,18 @@ export default function ExamsApp() {
       const data: ProcessExamResponse = await res.json();
       setExamData(data);
 
+      try {
+        await saveExamSession({
+          questionPaper: questionPaper!,
+          answerSheet: answerSheet!,
+          questionFile,
+          answerFile,
+          examData: data,
+        });
+      } catch {
+        // Processing is complete even when browser storage is unavailable.
+      }
+
       if (answerSheetUrl) URL.revokeObjectURL(answerSheetUrl);
       const url = URL.createObjectURL(answerFile);
       setAnswerSheetUrl(url);
@@ -96,9 +138,12 @@ export default function ExamsApp() {
       setProcessingError(message);
       setScreen("upload");
     }
-  }, [questionFile, answerFile, answerSheetUrl]);
+  }, [questionFile, answerFile, answerSheet, answerSheetUrl, questionPaper]);
 
   const handleBackToUpload = useCallback(() => {
+    void clearExamSession().catch(() => {
+      // The in-memory session is still cleared even if browser storage fails.
+    });
     setScreen("upload");
     setExamData(null);
     setProcessingError(null);
