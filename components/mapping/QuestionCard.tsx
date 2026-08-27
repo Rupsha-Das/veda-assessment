@@ -21,6 +21,12 @@ export default function QuestionCard({
   onSelect,
   onToggleExpand,
 }: QuestionCardProps) {
+  const hasScore =
+    question.marksObtained !== undefined && question.maxMarks !== undefined;
+  const scoreIsZero = hasScore && question.marksObtained === 0;
+  const scoreIsFull =
+    hasScore && question.marksObtained === question.maxMarks;
+
   return (
     <div
       onClick={onSelect}
@@ -34,13 +40,13 @@ export default function QuestionCard({
       <div className="flex items-start gap-3 p-3">
         <div
           className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
+            "flex min-w-7 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-bold",
             isSelected
               ? "bg-[--color-veda-orange] text-white"
-              : "bg-[--color-veda-dark] text-white",
+              : "bg-gray-100 text-foreground",
           )}
         >
-          Q{question.number}
+          {question.number}
         </div>
 
         <div className="min-w-0 flex-1">
@@ -49,7 +55,20 @@ export default function QuestionCard({
           </p>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-1">
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span
+            className={cn(
+              "rounded-full px-2 py-1 text-xs font-semibold",
+              !hasScore && "bg-gray-100 text-muted-foreground",
+              scoreIsZero && "bg-red-50 text-red-500",
+              scoreIsFull && "bg-green-50 text-[--color-veda-green]",
+              hasScore && !scoreIsZero && !scoreIsFull && "bg-orange-50 text-orange-600",
+            )}
+          >
+            {hasScore
+              ? `${question.marksObtained} / ${question.maxMarks}`
+              : "— / —"}
+          </span>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -70,10 +89,23 @@ export default function QuestionCard({
 
       {isExpanded && (
         <div className="animate-fade-in border-t border-[--color-border] px-3 pb-3 pt-3">
-          {hasAnswer ? (
+          {question.feedback ? (
             <div className="rounded-xl bg-gray-50 p-3">
+              <p className="mb-1 text-xs font-semibold text-foreground">
+                AI Feedback
+              </p>
+              <p className="text-[13px] leading-relaxed text-muted-foreground">
+                {question.feedback}
+              </p>
+            </div>
+          ) : hasAnswer ? (
+            <div className="rounded-xl bg-gray-50 p-3">
+              <p className="mb-1 text-xs font-semibold text-foreground">
+                AI Feedback
+              </p>
               <p className="text-[13px] text-muted-foreground">
-                Answer region detected on the answer sheet.
+                Evaluation is unavailable for this answer. Try processing the
+                papers again.
               </p>
             </div>
           ) : (

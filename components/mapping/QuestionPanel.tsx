@@ -3,7 +3,6 @@
 import { ArrowLeft } from "lucide-react";
 import type { Question, AnswerGroup } from "@/types/exam";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import QuestionCard from "./QuestionCard";
 
 interface QuestionPanelProps {
@@ -33,7 +32,7 @@ export default function QuestionPanel({
     answers.some((a) => a.questionNumber === number);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div className="flex shrink-0 items-center justify-between border-b border-[--color-border] px-4 py-3">
         <div className="flex items-center gap-2">
           {onBack && (
@@ -62,7 +61,7 @@ export default function QuestionPanel({
           {allExpanded ? "Collapse All" : "Expand All"}
         </button>
       </div>
-      <ScrollArea className="min-h-0 flex-1 p-3">
+      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain p-3 [touch-action:pan-y]">
         <div className="flex flex-col gap-2">
           {questions.map((q) => (
             <QuestionCard
@@ -81,7 +80,7 @@ export default function QuestionPanel({
             </p>
           )}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

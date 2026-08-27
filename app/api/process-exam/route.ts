@@ -3,6 +3,7 @@ import { runMistralOCR } from "@/lib/mistral/ocr";
 import { extractQuestions } from "@/lib/exam/extractQuestions";
 import { flattenAnswerBlocks } from "@/lib/exam/extractAnswers";
 import { segmentAnswersWithOpenAI } from "@/lib/exam/segmentAnswersWithOpenAI";
+import { evaluateAnswersWithOpenAI } from "@/lib/exam/evaluateAnswersWithOpenAI";
 import {
   validateSegmentation,
   segmentAnswersDeterministically,
@@ -106,6 +107,31 @@ export async function POST(request: NextRequest) {
       blocks: orderedBlocks,
     });
 
+    let evaluatedQuestions = questions;
+    if (questions.length > 0) {
+      try {
+        const evaluations = await evaluateAnswersWithOpenAI({
+          questions,
+          answers: segmentation.answers,
+          blocks: orderedBlocks,
+        });
+        const evaluationByNumber = new Map(
+          evaluations.map((evaluation) => [evaluation.questionNumber, evaluation]),
+        );
+        const matchedNumbers = new Set(
+          segmentation.answers.map((answer) => answer.questionNumber),
+        );
+        evaluatedQuestions = questions.map((question) => {
+          const evaluation = evaluationByNumber.get(question.number);
+          return evaluation && matchedNumbers.has(question.number)
+            ? { ...question, ...evaluation }
+            : question;
+        });
+      } catch (error) {
+        console.error("[process-exam] Evaluation failed:", error);
+      }
+    }
+
     console.log(`[process-exam] Final: ${answers.length} answer groups via ${segmentation.method}`);
 
     const answerPages = answerOCR.pages.map((p) => ({
@@ -115,7 +141,7 @@ export async function POST(request: NextRequest) {
     }));
 
     const response: ProcessExamResponse = {
-      questions,
+      questions: evaluatedQuestions,
       answers,
       answerPages,
     };

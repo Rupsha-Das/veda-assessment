@@ -36,28 +36,43 @@ export default function AnswerViewer({
   totalPages,
 }: AnswerViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const z = zoom / 100;
+  const [contentWidth, setContentWidth] = useState(0);
+
+  useEffect(() => {
+    const element = contentRef.current;
+    if (!element || typeof ResizeObserver === "undefined") return;
+
+    const updateWidth = () => setContentWidth(element.clientWidth);
+    updateWidth();
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   const highlightsOnPage = useMemo(() => {
-    const result: { questionNumber: string; region: AnswerRegion }[] = [];
-    for (const answer of answers) {
-      const region = answer.regions.find((r) => r.pageIndex === page);
-      if (region) {
-        result.push({
-          questionNumber: answer.questionNumber,
-          region,
-        });
-      }
-    }
-    return result;
-  }, [answers, page]);
+    if (selectedNumber === null) return [];
+
+    const answer = answers.find(
+      (item) => item.questionNumber === selectedNumber,
+    );
+    const region = answer?.regions.find((item) => item.pageIndex === page);
+
+    return region
+      ? [{ questionNumber: selectedNumber, region }]
+      : [];
+  }, [answers, page, selectedNumber]);
 
   const hasSelection = selectedNumber !== null;
 
   const isImage = answerSheetUrl.includes("image/");
 
   return (
-    <div ref={containerRef} className="flex h-full flex-col bg-[#efefef]">
+    <div
+      ref={containerRef}
+      className="flex h-full min-w-0 max-w-full flex-col overflow-hidden bg-[#efefef]"
+    >
       <AnswerToolbar
         zoom={zoom}
         page={page}
@@ -69,9 +84,12 @@ export default function AnswerViewer({
         onBack={onBack}
       />
 
-      <div className="min-h-0 flex-1 overflow-auto p-2 sm:p-4 md:p-6">
-        <div className="mx-auto flex justify-center">
-          <div className="relative inline-block">
+      <div
+        ref={contentRef}
+        className="min-h-0 min-w-0 max-w-full flex-1 overflow-auto p-2 sm:p-4 md:p-6"
+      >
+        <div className="flex w-full min-w-0 max-w-full justify-center">
+          <div className="relative min-w-0 max-w-full">
             {isImage ? (
               <ImagePage
                 url={answerSheetUrl}
@@ -87,6 +105,7 @@ export default function AnswerViewer({
                 url={answerSheetUrl}
                 pageNumber={page}
                 zoom={z}
+                availableWidth={contentWidth}
                 highlights={highlightsOnPage}
                 selectedNumber={selectedNumber}
                 hasSelection={hasSelection}
@@ -107,6 +126,7 @@ function PdfPage({
   url,
   pageNumber,
   zoom,
+  availableWidth,
   highlights,
   selectedNumber,
   hasSelection,
@@ -116,6 +136,7 @@ function PdfPage({
   url: string;
   pageNumber: number;
   zoom: number;
+  availableWidth: number;
   highlights: { questionNumber: string; region: AnswerRegion }[];
   selectedNumber: string | null;
   hasSelection: boolean;
@@ -136,31 +157,33 @@ function PdfPage({
 
   if (!Document || !Page) {
     return (
-      <div className="flex h-[600px] w-[420px] items-center justify-center rounded bg-gray-100">
+      <div className="flex aspect-[7/10] min-h-[420px] w-full max-w-[420px] items-center justify-center rounded bg-gray-100">
         <p className="text-sm text-muted-foreground">Loading PDF viewer...</p>
       </div>
     );
   }
 
   return (
-    <div className="relative">
+    <div className="relative w-full max-w-full">
       <Document
         file={url}
         onLoadSuccess={() => setPdfLoaded(true)}
         loading={
-          <div className="flex h-[600px] w-[420px] items-center justify-center rounded bg-gray-100">
+          <div className="flex aspect-[7/10] min-h-[420px] w-full max-w-[420px] items-center justify-center rounded bg-gray-100">
             <p className="text-sm text-muted-foreground">Loading PDF...</p>
           </div>
         }
         error={
-          <div className="flex h-[600px] w-[420px] items-center justify-center rounded bg-red-50">
+          <div className="flex aspect-[7/10] min-h-[420px] w-full max-w-[420px] items-center justify-center rounded bg-red-50">
             <p className="text-sm text-red-500">Failed to load PDF.</p>
           </div>
         }
       >
         <Page
           pageNumber={pageNumber + 1}
-          scale={zoom}
+          {...(availableWidth > 0
+            ? { width: Math.max(0, availableWidth - 16) * zoom }
+            : { scale: zoom })}
           renderAnnotationLayer={false}
           renderTextLayer={false}
           className="shadow-lg"
@@ -220,7 +243,7 @@ function ImagePage({
   const displayH = dims.h * zoom;
 
   return (
-    <div className="relative inline-block">
+    <div className="relative w-full max-w-full">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url}
@@ -228,7 +251,8 @@ function ImagePage({
         onLoad={handleLoad}
         style={{
           width: displayW || undefined,
-          height: displayH || undefined,
+          height: zoom <= 1 ? "auto" : displayH || undefined,
+          maxWidth: zoom <= 1 ? "100%" : undefined,
           display: "block",
         }}
         className="shadow-lg"

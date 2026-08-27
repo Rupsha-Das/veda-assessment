@@ -12,6 +12,11 @@ type FoundQuestion = {
   afterMarkerIndex: number;
 };
 
+function getMaxMarks(text: string): number | undefined {
+  const match = text.match(/(?:\(|\[)?\s*(\d{1,3})\s*marks?\s*(?:\)|\])?/i);
+  return match ? Number(match[1]) : undefined;
+}
+
 function findLineQuestions(text: string): FoundQuestion[] {
   const results: FoundQuestion[] = [];
   const lines = text.split(/\n/);
@@ -95,10 +100,12 @@ export function extractQuestions(doc: OCRDocument): Question[] {
     const rawText = workingText.substring(f.afterMarkerIndex, endIdx).trim();
     const text = rawText.replace(/\s+/g, " ").trim();
 
+    const maxMarks = getMaxMarks(text);
     questions.push({
       id: f.number,
       number: f.number,
       text: text || `Question ${f.number}`,
+      ...(maxMarks ? { maxMarks } : {}),
     });
   }
 

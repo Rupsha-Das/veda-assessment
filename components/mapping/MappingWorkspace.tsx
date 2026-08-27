@@ -44,6 +44,19 @@ export default function MappingWorkspace({
     () => examData.answerPages.length || 1,
     [examData.answerPages],
   );
+  const selectedQuestionNumber =
+    examData.questions.find((question) => question.id === selectedNumber)?.number ??
+    null;
+
+  const selectAnswerQuestion = (number: string) => {
+    const question = examData.questions.find((item) => item.number === number);
+    if (question) selectQuestion(question.id);
+  };
+
+  const setAnswerHighlightRef = (number: string, el: HTMLButtonElement | null) => {
+    const question = examData.questions.find((item) => item.number === number);
+    setHighlightRef(question?.id ?? number, el);
+  };
 
   const handleZoomIn = () => {
     const idx = ZOOM_LEVELS.indexOf(zoom);
@@ -107,11 +120,11 @@ export default function MappingWorkspace({
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className="flex h-full min-w-0 flex-col overflow-hidden">
       <Tabs
         value={mobileTab}
         onValueChange={setMobileTab}
-        className="flex min-h-0 flex-1 flex-col lg:hidden"
+        className="flex min-h-0 min-w-0 flex-1 flex-col lg:hidden"
       >
         <TabsList className="mx-4 my-2 h-auto w-fit justify-start rounded-full bg-gray-200 p-1">
           <TabsTrigger
@@ -130,7 +143,7 @@ export default function MappingWorkspace({
 
         <TabsContent
           value="questions"
-          className="min-h-0 flex-1 overflow-hidden"
+          className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
         >
           <QuestionPanel
             questions={examData.questions}
@@ -144,19 +157,22 @@ export default function MappingWorkspace({
           />
         </TabsContent>
 
-        <TabsContent value="answer" className="min-h-0 flex-1 overflow-hidden">
+        <TabsContent
+          value="answer"
+          className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden"
+        >
           <AnswerViewer
             answers={examData.answers}
             answerSheetUrl={answerSheetUrl}
-            selectedNumber={selectedNumber}
-            onSelect={selectQuestion}
+            selectedNumber={selectedQuestionNumber}
+            onSelect={selectAnswerQuestion}
             zoom={zoom}
             page={page}
             setPage={setPage}
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
             onBack={onBack}
-            setHighlightRef={setHighlightRef}
+            setHighlightRef={setAnswerHighlightRef}
             totalPages={totalPages}
           />
         </TabsContent>
@@ -195,15 +211,15 @@ export default function MappingWorkspace({
             <AnswerViewer
               answers={examData.answers}
               answerSheetUrl={answerSheetUrl}
-              selectedNumber={selectedNumber}
-              onSelect={selectQuestion}
+              selectedNumber={selectedQuestionNumber}
+              onSelect={selectAnswerQuestion}
               zoom={zoom}
               page={page}
               setPage={setPage}
               onZoomIn={handleZoomIn}
               onZoomOut={handleZoomOut}
               onBack={onBack}
-              setHighlightRef={setHighlightRef}
+              setHighlightRef={setAnswerHighlightRef}
               totalPages={totalPages}
             />
           </ResizablePanel>

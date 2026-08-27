@@ -54,6 +54,9 @@ export type Question = {
   id: string;
   number: string;
   text: string;
+  maxMarks?: number;
+  marksObtained?: number;
+  feedback?: string;
 };
 
 export type AnswerRegion = {
