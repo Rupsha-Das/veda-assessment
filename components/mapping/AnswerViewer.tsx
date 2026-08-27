@@ -38,15 +38,27 @@ export default function AnswerViewer({
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const z = zoom / 100;
-  const [contentWidth, setContentWidth] = useState(0);
+  const [contentSize, setContentSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     const element = contentRef.current;
     if (!element || typeof ResizeObserver === "undefined") return;
 
-    const updateWidth = () => setContentWidth(element.clientWidth);
-    updateWidth();
-    const observer = new ResizeObserver(updateWidth);
+    const updateSize = () => {
+      const styles = getComputedStyle(element);
+      const horizontalPadding =
+        parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+      const verticalPadding =
+        parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+
+      setContentSize({
+        width: Math.max(0, element.clientWidth - horizontalPadding),
+        height: Math.max(0, element.clientHeight - verticalPadding),
+      });
+    };
+
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
@@ -88,12 +100,14 @@ export default function AnswerViewer({
         ref={contentRef}
         className="min-h-0 min-w-0 max-w-full flex-1 overflow-auto p-2 sm:p-4 md:p-6"
       >
-        <div className="flex w-full min-w-0 max-w-full justify-center">
-          <div className="relative min-w-0 max-w-full">
+        <div className="flex min-h-full min-w-full w-max justify-center">
+          <div className="relative shrink-0">
             {isImage ? (
               <ImagePage
                 url={answerSheetUrl}
                 zoom={z}
+                availableWidth={contentSize.width}
+                availableHeight={contentSize.height}
                 highlights={highlightsOnPage}
                 selectedNumber={selectedNumber}
                 hasSelection={hasSelection}
@@ -105,7 +119,8 @@ export default function AnswerViewer({
                 url={answerSheetUrl}
                 pageNumber={page}
                 zoom={z}
-                availableWidth={contentWidth}
+                availableWidth={contentSize.width}
+                availableHeight={contentSize.height}
                 highlights={highlightsOnPage}
                 selectedNumber={selectedNumber}
                 hasSelection={hasSelection}
@@ -127,6 +142,7 @@ function PdfPage({
   pageNumber,
   zoom,
   availableWidth,
+  availableHeight,
   highlights,
   selectedNumber,
   hasSelection,
@@ -137,6 +153,7 @@ function PdfPage({
   pageNumber: number;
   zoom: number;
   availableWidth: number;
+  availableHeight: number;
   highlights: { questionNumber: string; region: AnswerRegion }[];
   selectedNumber: string | null;
   hasSelection: boolean;
@@ -146,6 +163,7 @@ function PdfPage({
   const [Document, setDocument] = useState<typeof import("react-pdf").Document | null>(null);
   const [Page, setPageComp] = useState<typeof import("react-pdf").Page | null>(null);
   const [pdfLoaded, setPdfLoaded] = useState(false);
+  const [pageSize, setPageSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     import("react-pdf").then((mod) => {
@@ -163,8 +181,17 @@ function PdfPage({
     );
   }
 
+  const fitWidth =
+    pageSize.width > 0 && pageSize.height > 0
+      ? Math.min(
+          availableWidth,
+          availableHeight * (pageSize.width / pageSize.height),
+        )
+      : availableWidth;
+  const pageWidth = Math.max(0, fitWidth - 16) * zoom;
+
   return (
-    <div className="relative w-full max-w-full">
+    <div className="relative shrink-0" style={{ width: pageWidth || undefined }}>
       <Document
         file={url}
         onLoadSuccess={() => setPdfLoaded(true)}
@@ -181,9 +208,11 @@ function PdfPage({
       >
         <Page
           pageNumber={pageNumber + 1}
-          {...(availableWidth > 0
-            ? { width: Math.max(0, availableWidth - 16) * zoom }
-            : { scale: zoom })}
+          {...(pageWidth > 0 ? { width: pageWidth } : { scale: zoom })}
+          onLoadSuccess={(loadedPage) => {
+            const viewport = loadedPage.getViewport({ scale: 1 });
+            setPageSize({ width: viewport.width, height: viewport.height });
+          }}
           renderAnnotationLayer={false}
           renderTextLayer={false}
           className="shadow-lg"
@@ -213,6 +242,8 @@ function PdfPage({
 function ImagePage({
   url,
   zoom,
+  availableWidth,
+  availableHeight,
   highlights,
   selectedNumber,
   hasSelection,
@@ -221,6 +252,8 @@ function ImagePage({
 }: {
   url: string;
   zoom: number;
+  availableWidth: number;
+  availableHeight: number;
   highlights: { questionNumber: string; region: AnswerRegion }[];
   selectedNumber: string | null;
   hasSelection: boolean;
@@ -239,11 +272,14 @@ function ImagePage({
     [],
   );
 
-  const displayW = dims.w * zoom;
-  const displayH = dims.h * zoom;
+  const fitWidth =
+    dims.w > 0 && dims.h > 0
+      ? Math.min(availableWidth, availableHeight * (dims.w / dims.h))
+      : availableWidth;
+  const displayW = Math.max(0, fitWidth - 16) * zoom;
 
   return (
-    <div className="relative w-full max-w-full">
+    <div className="relative shrink-0" style={{ width: displayW || undefined }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url}
@@ -251,8 +287,7 @@ function ImagePage({
         onLoad={handleLoad}
         style={{
           width: displayW || undefined,
-          height: zoom <= 1 ? "auto" : displayH || undefined,
-          maxWidth: zoom <= 1 ? "100%" : undefined,
+          height: "auto",
           display: "block",
         }}
         className="shadow-lg"

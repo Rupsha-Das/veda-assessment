@@ -26,15 +26,17 @@ export default function Topbar({
   return (
     <header className="flex h-[52px] shrink-0 items-center gap-2 bg-[#292929] px-3 sm:h-[60px]">
       {/* Left side */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onBack}
-        className="text-white hover:bg-white/10 lg:hidden"
-        aria-label="Back"
-      >
-        <ChevronLeft />
-      </Button>
+      {onBack && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onBack}
+          className="text-white hover:bg-white/10 lg:hidden"
+          aria-label="Back"
+        >
+          <ChevronLeft />
+        </Button>
+      )}
 
       <Button
         variant="ghost"
@@ -78,7 +80,7 @@ export default function Topbar({
           variant="ghost"
           size="icon"
           onClick={onOpenMobileSidebar}
-          className="hidden text-white hover:bg-white/10 lg:inline-flex"
+          className="text-white hover:bg-white/10 lg:hidden"
           aria-label="Menu"
         >
           <Menu />
