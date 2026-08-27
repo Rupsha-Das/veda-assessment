@@ -178,7 +178,7 @@ export default function MappingWorkspace({
         </TabsContent>
       </Tabs>
 
-      <div className="hidden min-h-0 flex-1 lg:flex">
+      <div className="hidden min-h-0 min-w-0 flex-1 lg:flex">
         <ResizablePanelGroup
           orientation="horizontal"
           className="min-h-0 flex-1"
@@ -187,7 +187,7 @@ export default function MappingWorkspace({
             defaultSize="45%"
             minSize="25%"
             maxSize="55%"
-            className="min-h-0 min-w-0 flex-col bg-white"
+            className="flex min-h-0 min-w-0 flex-col bg-white"
           >
             <QuestionPanel
               questions={examData.questions}
@@ -206,7 +206,7 @@ export default function MappingWorkspace({
           <ResizablePanel
             defaultSize="55%"
             minSize="45%"
-            className="min-h-0 min-w-0 flex-col"
+            className="flex min-h-0 min-w-0 flex-col"
           >
             <AnswerViewer
               answers={examData.answers}
