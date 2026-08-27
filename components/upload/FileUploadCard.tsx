@@ -110,7 +110,7 @@ export default function FileUploadCard({
             handleFiles(e.dataTransfer.files);
           }}
           className={cn(
-            "flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed bg-white p-8 transition-all",
+            "flex w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed bg-white p-6 transition-all",
             isDragging
               ? "border-[--color-veda-orange] bg-[--color-veda-orange-soft]"
               : "border-gray-200 hover:border-gray-300",

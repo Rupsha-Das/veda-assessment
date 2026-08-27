@@ -36,7 +36,7 @@ export default function UploadPage({
   );
 
   return (
-    <div className="flex min-h-full flex-col items-center px-4 py-8 md:py-12">
+    <div className="flex min-h-full flex-col items-center px-4 py-4 md:py-6">
       <h1 className="text-center text-2xl font-bold tracking-tight text-foreground md:text-[32px]">
         Upload{" "}
         <span className="text-[--color-veda-orange]">
@@ -47,7 +47,7 @@ export default function UploadPage({
         Upload both files to get started
       </p>
 
-      <div className="my-6 md:my-8">
+      <div className="my-3 md:my-4">
         <TeacherIllustration />
       </div>
 
