@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function TeacherIllustration() {
   return (
-    <div className="relative w-[min(78vw,420px)] overflow-hidden rounded-[2px]">
+    <div className="relative w-[min(68vw,320px)] overflow-hidden rounded-[2px]">
       <Image
         src="/teacher-illustration.png"
         alt="Teacher reviewing a student's answers"
