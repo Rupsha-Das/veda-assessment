@@ -8,8 +8,9 @@ import UploadPage from "@/components/upload/UploadPage";
 import ExtractionLoader from "@/components/loading/ExtractionLoader";
 import MappingWorkspace from "@/components/mapping/MappingWorkspace";
 import {
-  clearExamSession,
+  loadDraftMetadata,
   loadExamSession,
+  saveDraftMetadata,
   saveExamSession,
 } from "@/lib/exam/examSession";
 
@@ -30,6 +31,12 @@ export default function ExamsApp() {
 
     const restoreSession = async () => {
       try {
+        const draftMetadata = loadDraftMetadata();
+        if (draftMetadata) {
+          setQuestionPaper(draftMetadata.questionPaper);
+          setAnswerSheet(draftMetadata.answerSheet);
+        }
+
         const session = await loadExamSession();
         if (!mounted) return;
 
@@ -38,9 +45,11 @@ export default function ExamsApp() {
           setAnswerSheet(session.answerSheet);
           setQuestionFile(session.questionFile);
           setAnswerFile(session.answerFile);
-          setExamData(session.examData);
-          setAnswerSheetUrl(URL.createObjectURL(session.answerFile));
-          setScreen("mapping");
+          if (session.examData && session.answerFile) {
+            setExamData(session.examData);
+            setAnswerSheetUrl(URL.createObjectURL(session.answerFile));
+            setScreen("mapping");
+          }
         }
       } catch {
         // A storage failure should not prevent a new upload from working.
@@ -68,6 +77,16 @@ export default function ExamsApp() {
 
   const handleUpload = useCallback(
     (kind: "question" | "answer", file: UploadedFileMeta, raw: File) => {
+      const nextQuestionPaper = kind === "question" ? file : questionPaper;
+      const nextAnswerSheet = kind === "answer" ? file : answerSheet;
+      const nextQuestionFile = kind === "question" ? raw : questionFile;
+      const nextAnswerFile = kind === "answer" ? raw : answerFile;
+
+      saveDraftMetadata({
+        questionPaper: nextQuestionPaper,
+        answerSheet: nextAnswerSheet,
+      });
+
       if (kind === "question") {
         setQuestionPaper(file);
         setQuestionFile(raw);
@@ -75,12 +94,30 @@ export default function ExamsApp() {
         setAnswerSheet(file);
         setAnswerFile(raw);
       }
+
+      void saveExamSession({
+        questionPaper: nextQuestionPaper,
+        answerSheet: nextAnswerSheet,
+        questionFile: nextQuestionFile,
+        answerFile: nextAnswerFile,
+        examData: null,
+      });
     },
-    [],
+    [answerFile, answerSheet, questionFile, questionPaper],
   );
 
   const handleRemove = useCallback(
     (kind: "question" | "answer") => {
+      const nextQuestionPaper = kind === "question" ? null : questionPaper;
+      const nextAnswerSheet = kind === "answer" ? null : answerSheet;
+      const nextQuestionFile = kind === "question" ? null : questionFile;
+      const nextAnswerFile = kind === "answer" ? null : answerFile;
+
+      saveDraftMetadata({
+        questionPaper: nextQuestionPaper,
+        answerSheet: nextAnswerSheet,
+      });
+
       if (kind === "question") {
         setQuestionPaper(null);
         setQuestionFile(null);
@@ -88,8 +125,16 @@ export default function ExamsApp() {
         setAnswerSheet(null);
         setAnswerFile(null);
       }
+
+      void saveExamSession({
+        questionPaper: nextQuestionPaper,
+        answerSheet: nextAnswerSheet,
+        questionFile: nextQuestionFile,
+        answerFile: nextAnswerFile,
+        examData: null,
+      });
     },
-    [],
+    [answerFile, answerSheet, questionFile, questionPaper],
   );
 
   const handleProcess = useCallback(async () => {
@@ -140,14 +185,20 @@ export default function ExamsApp() {
     }
   }, [questionFile, answerFile, answerSheet, answerSheetUrl, questionPaper]);
 
-  const handleBackToUpload = useCallback(() => {
-    void clearExamSession().catch(() => {
-      // The in-memory session is still cleared even if browser storage fails.
+  const handleBackToUpload = useCallback(async () => {
+    // Returning to submission keeps both uploaded files available after a reload.
+    saveDraftMetadata({ questionPaper, answerSheet });
+    await saveExamSession({
+      questionPaper,
+      answerSheet,
+      questionFile,
+      answerFile,
+      examData: null,
     });
     setScreen("upload");
     setExamData(null);
     setProcessingError(null);
-  }, []);
+  }, [answerFile, answerSheet, questionFile, questionPaper]);
 
   if (!hydrated) {
     return <div className="h-dvh bg-[#f7f7f7]" />;

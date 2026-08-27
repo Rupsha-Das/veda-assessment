@@ -5,13 +5,15 @@ const DATABASE_NAME = "veda-assessment";
 const STORE_NAME = "exam-session";
 const SESSION_KEY = "current";
 const FALLBACK_STORAGE_KEY = "veda-assessment-exam-session";
+const DRAFT_METADATA_KEY = "veda-assessment-uploaded-files";
+const DRAFT_COOKIE_KEY = "veda_assessment_uploaded_files";
 
 export type PersistedExamSession = {
-  questionPaper: UploadedFileMeta;
-  answerSheet: UploadedFileMeta;
-  questionFile: File;
-  answerFile: File;
-  examData: ProcessExamResponse;
+  questionPaper: UploadedFileMeta | null;
+  answerSheet: UploadedFileMeta | null;
+  questionFile: File | null;
+  answerFile: File | null;
+  examData: ProcessExamResponse | null;
 };
 
 type StoredFile = {
@@ -22,9 +24,46 @@ type StoredFile = {
 };
 
 type FallbackSession = Omit<PersistedExamSession, "questionFile" | "answerFile"> & {
-  questionFile: StoredFile;
-  answerFile: StoredFile;
+  questionFile: StoredFile | null;
+  answerFile: StoredFile | null;
 };
+
+export type DraftMetadata = Pick<PersistedExamSession, "questionPaper" | "answerSheet">;
+
+let saveQueue: Promise<void> = Promise.resolve();
+
+export function saveDraftMetadata(metadata: DraftMetadata) {
+  const value = JSON.stringify(metadata);
+  try {
+    window.localStorage.setItem(DRAFT_METADATA_KEY, value);
+  } catch {
+    // File persistence below may still work through IndexedDB.
+  }
+  try {
+    document.cookie = `${DRAFT_COOKIE_KEY}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax`;
+  } catch {
+    // Some embedded browsers can disable cookies as well.
+  }
+}
+
+export function loadDraftMetadata(): DraftMetadata | null {
+  try {
+    const stored = window.localStorage.getItem(DRAFT_METADATA_KEY);
+    if (stored) return JSON.parse(stored) as DraftMetadata;
+  } catch {
+    // Try the cookie fallback below.
+  }
+
+  try {
+    const cookie = document.cookie
+      .split("; ")
+      .find((item) => item.startsWith(`${DRAFT_COOKIE_KEY}=`));
+    if (!cookie) return null;
+    return JSON.parse(decodeURIComponent(cookie.slice(DRAFT_COOKIE_KEY.length + 1))) as DraftMetadata;
+  } catch {
+    return null;
+  }
+}
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -43,26 +82,26 @@ async function dataUrlToFile(file: StoredFile) {
 
 async function saveFallbackSession(session: PersistedExamSession) {
   const [questionDataUrl, answerDataUrl] = await Promise.all([
-    fileToDataUrl(session.questionFile),
-    fileToDataUrl(session.answerFile),
+    session.questionFile ? fileToDataUrl(session.questionFile) : Promise.resolve(null),
+    session.answerFile ? fileToDataUrl(session.answerFile) : Promise.resolve(null),
   ]);
 
   const fallbackSession: FallbackSession = {
     questionPaper: session.questionPaper,
     answerSheet: session.answerSheet,
     examData: session.examData,
-    questionFile: {
+    questionFile: session.questionFile && questionDataUrl ? {
       name: session.questionFile.name,
       type: session.questionFile.type,
       lastModified: session.questionFile.lastModified,
       dataUrl: questionDataUrl,
-    },
-    answerFile: {
+    } : null,
+    answerFile: session.answerFile && answerDataUrl ? {
       name: session.answerFile.name,
       type: session.answerFile.type,
       lastModified: session.answerFile.lastModified,
       dataUrl: answerDataUrl,
-    },
+    } : null,
   };
 
   window.localStorage.setItem(FALLBACK_STORAGE_KEY, JSON.stringify(fallbackSession));
@@ -80,7 +119,7 @@ function openDatabase(): Promise<IDBDatabase> {
   });
 }
 
-export async function saveExamSession(session: PersistedExamSession) {
+async function saveExamSessionNow(session: PersistedExamSession) {
   try {
     const database = await openDatabase();
 
@@ -109,6 +148,12 @@ export async function saveExamSession(session: PersistedExamSession) {
   }
 }
 
+export function saveExamSession(session: PersistedExamSession) {
+  const nextSave = saveQueue.then(() => saveExamSessionNow(session));
+  saveQueue = nextSave.catch(() => undefined);
+  return nextSave;
+}
+
 export async function loadExamSession(): Promise<PersistedExamSession | null> {
   try {
     const database = await openDatabase();
@@ -131,8 +176,8 @@ export async function loadExamSession(): Promise<PersistedExamSession | null> {
 
     const fallback = JSON.parse(stored) as FallbackSession;
     const [questionFile, answerFile] = await Promise.all([
-      dataUrlToFile(fallback.questionFile),
-      dataUrlToFile(fallback.answerFile),
+      fallback.questionFile ? dataUrlToFile(fallback.questionFile) : Promise.resolve(null),
+      fallback.answerFile ? dataUrlToFile(fallback.answerFile) : Promise.resolve(null),
     ]);
 
     return { ...fallback, questionFile, answerFile };
@@ -142,7 +187,10 @@ export async function loadExamSession(): Promise<PersistedExamSession | null> {
 }
 
 export async function clearExamSession() {
+  await saveQueue.catch(() => undefined);
+  window.localStorage.removeItem(DRAFT_METADATA_KEY);
   window.localStorage.removeItem(FALLBACK_STORAGE_KEY);
+  document.cookie = `${DRAFT_COOKIE_KEY}=; path=/; max-age=0; SameSite=Lax`;
 
   try {
     const database = await openDatabase();
