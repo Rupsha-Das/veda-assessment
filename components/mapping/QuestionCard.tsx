@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Question } from "@/types/exam";
 
@@ -11,6 +11,31 @@ interface QuestionCardProps {
   isExpanded: boolean;
   onSelect: () => void;
   onToggleExpand: () => void;
+}
+
+function displayFeedback(questionNumber: string, feedback: string, complete: boolean) {
+  if (
+    /^(Excellent work!|Strong response!|Great job!|Well done!|Good attempt\.|You’re on the right track\.|Solid start\.|There are some good points here\.)/.test(
+      feedback,
+    ) || feedback.startsWith("No answer")
+  ) {
+    return feedback;
+  }
+
+  const openings = complete
+    ? ["Excellent work!", "Strong response!", "Great job!", "Well done!"]
+    : [
+        "Good attempt.",
+        "You’re on the right track.",
+        "Solid start.",
+        "There are some good points here.",
+      ];
+  const numericPart = Number.parseInt(questionNumber, 10);
+  const index = Number.isNaN(numericPart)
+    ? questionNumber.length % openings.length
+    : Math.abs(numericPart) % openings.length;
+
+  return `${openings[index]} ${feedback}`;
 }
 
 export default function QuestionCard({
@@ -40,10 +65,8 @@ export default function QuestionCard({
       <div className="flex items-start gap-3 p-3">
         <div
           className={cn(
-            "flex min-w-7 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-bold",
-            isSelected
-              ? "bg-[--color-veda-orange] text-white"
-              : "bg-gray-100 text-foreground",
+            "flex min-w-7 shrink-0 items-center justify-center rounded-full bg-foreground px-1.5 text-[11px] font-bold text-background",
+            isSelected && "ring-2 ring-foreground/20 ring-offset-1",
           )}
         >
           {question.number}
@@ -90,20 +113,26 @@ export default function QuestionCard({
       {isExpanded && (
         <div className="animate-fade-in border-t border-[--color-border] px-3 pb-3 pt-3">
           {question.feedback ? (
-            <div className="rounded-xl bg-gray-50 p-3">
-              <p className="mb-1 text-xs font-semibold text-foreground">
-                AI Feedback
-              </p>
-              <p className="text-[13px] leading-relaxed text-muted-foreground">
-                {question.feedback}
+            <div className="rounded-xl border border-[--color-veda-orange-border] bg-[--color-veda-orange-soft] p-4">
+              <div className="mb-2 flex items-center gap-2">
+                <Sparkles className="size-4 text-[--color-veda-orange]" />
+                <p className="text-sm font-semibold text-foreground">
+                  AI Feedback
+                </p>
+              </div>
+              <p className="text-sm leading-6 text-muted-foreground">
+                {displayFeedback(question.number, question.feedback, scoreIsFull)}
               </p>
             </div>
           ) : hasAnswer ? (
-            <div className="rounded-xl bg-gray-50 p-3">
-              <p className="mb-1 text-xs font-semibold text-foreground">
-                AI Feedback
-              </p>
-              <p className="text-[13px] text-muted-foreground">
+            <div className="rounded-xl border border-[--color-border] bg-gray-50 p-4">
+              <div className="mb-2 flex items-center gap-2">
+                <Sparkles className="size-4 text-muted-foreground" />
+                <p className="text-sm font-semibold text-foreground">
+                  AI Feedback
+                </p>
+              </div>
+              <p className="text-sm leading-6 text-muted-foreground">
                 Evaluation is unavailable for this answer. Try processing the
                 papers again.
               </p>

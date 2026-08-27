@@ -55,6 +55,39 @@ function defaultMaxMarks(question: Question): number {
   return length > 18 ? 5 : length > 8 ? 3 : 2;
 }
 
+function feedbackOpening(questionNumber: string, complete: boolean): string {
+  const openings = complete
+    ? ["Excellent work!", "Strong response!", "Great job!", "Well done!"]
+    : [
+        "Good attempt.",
+        "You’re on the right track.",
+        "Solid start.",
+        "There are some good points here.",
+      ];
+  const numericPart = Number.parseInt(questionNumber, 10);
+  const index = Number.isNaN(numericPart)
+    ? questionNumber.length % openings.length
+    : Math.abs(numericPart) % openings.length;
+
+  return openings[index];
+}
+
+function addFeedbackOpening(
+  questionNumber: string,
+  feedback: string,
+  complete: boolean,
+): string {
+  if (
+    /^(Excellent work!|Strong response!|Great job!|Well done!|Good attempt\.|You’re on the right track\.|Solid start\.|There are some good points here\.)/.test(
+      feedback,
+    ) || feedback.startsWith("No answer")
+  ) {
+    return feedback;
+  }
+
+  return `${feedbackOpening(questionNumber, complete)} ${feedback}`;
+}
+
 function evaluateLocally(
   questions: Question[],
   answers: AnswerAssociation[],
@@ -88,9 +121,9 @@ function evaluateLocally(
     if (!answer) {
       feedback = `No answer was found for this question, so it could not be evaluated.`;
     } else if (obtained === maximum) {
-      feedback = `Your answer addresses the key points of this question, including ${topic}, and is complete for the marks available.`;
+      feedback = `${feedbackOpening(question.number, true)} Your answer addresses the key points of this question, including ${topic}, and is complete for the marks available.`;
     } else if (obtained > 0) {
-      feedback = `Good attempt. Your answer addresses ${topic}, but it should also cover ${missing.join(", ") || "the remaining parts of the question"} to be complete.`;
+      feedback = `${feedbackOpening(question.number, false)} Your answer addresses ${topic}, but it should also cover ${missing.join(", ") || "the remaining parts of the question"} to be complete.`;
     } else {
       feedback = `Your answer does not yet address the key requirements of this question. Review ${missing.join(", ") || "the relevant concepts"} and answer each part directly.`;
     }
@@ -128,6 +161,7 @@ export async function evaluateAnswersWithOpenAI({
 - Award only marks supported by the answer. Never award marks just because an answer region exists.
 - Keep marksObtained between 0 and maxMarks.
 - Write concise, question-specific feedback based on the answer.
+- Vary the opening of each feedback so adjacent answers do not all begin with the same phrase. Use encouraging openings such as "Excellent work!", "Strong response!", "Great job!", or "Well done!" when the answer earns full marks, and constructive alternatives for partial answers.
 - For unanswered questions, return zero and explain what is missing.
 - Return one evaluation for every question, including unanswered questions.`,
     input: JSON.stringify({
@@ -164,6 +198,11 @@ export async function evaluateAnswersWithOpenAI({
       marksObtained: Math.max(
         0,
         Math.min(maxMarks, Math.round(evaluation.marksObtained)),
+      ),
+      feedback: addFeedbackOpening(
+        evaluation.questionNumber,
+        evaluation.feedback,
+        Math.round(evaluation.marksObtained) === maxMarks,
       ),
     };
     });
