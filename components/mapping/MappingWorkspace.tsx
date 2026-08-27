@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import type { ZoomLevel } from "@/types/mapping";
-import { ZOOM_LEVELS, TOTAL_PAGES } from "@/types/mapping";
-import { mockQuestions } from "@/data/mockQuestions";
+import { ZOOM_LEVELS } from "@/types/mapping";
+import type { ProcessExamResponse } from "@/types/exam";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -14,24 +14,35 @@ import QuestionPanel from "./QuestionPanel";
 import AnswerViewer from "./AnswerViewer";
 
 interface MappingWorkspaceProps {
+  examData: ProcessExamResponse;
+  answerSheetUrl: string;
   onBack: () => void;
 }
 
-export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+export default function MappingWorkspace({
+  examData,
+  answerSheetUrl,
+  onBack,
+}: MappingWorkspaceProps) {
+  const [selectedNumber, setSelectedNumber] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [zoom, setZoom] = useState<ZoomLevel>(100);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [mobileTab, setMobileTab] = useState<string>("questions");
 
-  const highlightRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+  const highlightRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
 
   const setHighlightRef = useCallback(
-    (id: number, el: HTMLButtonElement | null) => {
+    (id: string, el: HTMLButtonElement | null) => {
       if (el) highlightRefs.current.set(id, el);
       else highlightRefs.current.delete(id);
     },
     [],
+  );
+
+  const totalPages = useMemo(
+    () => examData.answerPages.length || 1,
+    [examData.answerPages],
   );
 
   const handleZoomIn = () => {
@@ -44,7 +55,7 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
     if (idx > 0) setZoom(ZOOM_LEVELS[idx - 1]);
   };
 
-  const toggleExpand = (id: number) => {
+  const toggleExpand = (id: string) => {
     setExpandedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -54,18 +65,29 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
   };
 
   const toggleAll = () => {
-    if (expandedIds.size === mockQuestions.length) {
+    if (expandedIds.size === examData.questions.length) {
       setExpandedIds(new Set());
     } else {
-      setExpandedIds(new Set(mockQuestions.map((q) => q.id)));
+      setExpandedIds(new Set(examData.questions.map((q) => q.id)));
     }
   };
 
-  const selectQuestion = (id: number) => {
-    setSelectedId(id);
-    const q = mockQuestions.find((m) => m.id === id);
-    if (q?.answerRegion && q.answerRegion.page !== page) {
-      setPage(q.answerRegion.page);
+  const findFirstRegion = (questionNumber: string) => {
+    const answer = examData.answers.find(
+      (a) => a.questionNumber === questionNumber,
+    );
+    if (!answer || answer.regions.length === 0) return null;
+    return answer.regions[0];
+  };
+
+  const selectQuestion = (id: string) => {
+    setSelectedNumber(id);
+    const q = examData.questions.find((m) => m.id === id);
+    if (q) {
+      const region = findFirstRegion(q.number);
+      if (region && region.pageIndex !== page) {
+        setPage(region.pageIndex);
+      }
     }
     setExpandedIds((prev) => {
       if (prev.has(id)) return prev;
@@ -79,14 +101,13 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
     }, 150);
   };
 
-  const handleMobileTabSelect = (id: number) => {
+  const handleMobileTabSelect = (id: string) => {
     selectQuestion(id);
     setMobileTab("answer");
   };
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* Mobile: Tabs-based layout */}
       <Tabs
         value={mobileTab}
         onValueChange={setMobileTab}
@@ -112,7 +133,9 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
           className="min-h-0 flex-1 overflow-hidden"
         >
           <QuestionPanel
-            selectedId={selectedId}
+            questions={examData.questions}
+            answers={examData.answers}
+            selectedNumber={selectedNumber}
             expandedIds={expandedIds}
             onSelect={handleMobileTabSelect}
             onToggleExpand={toggleExpand}
@@ -123,7 +146,9 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
 
         <TabsContent value="answer" className="min-h-0 flex-1 overflow-hidden">
           <AnswerViewer
-            selectedId={selectedId}
+            answers={examData.answers}
+            answerSheetUrl={answerSheetUrl}
+            selectedNumber={selectedNumber}
             onSelect={selectQuestion}
             zoom={zoom}
             page={page}
@@ -132,12 +157,11 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
             onZoomOut={handleZoomOut}
             onBack={onBack}
             setHighlightRef={setHighlightRef}
-            totalPages={TOTAL_PAGES}
+            totalPages={totalPages}
           />
         </TabsContent>
       </Tabs>
 
-      {/* Desktop: side-by-side resizable panels */}
       <div className="hidden min-h-0 flex-1 lg:flex">
         <ResizablePanelGroup
           orientation="horizontal"
@@ -150,7 +174,9 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
             className="min-h-0 min-w-0 flex-col bg-white"
           >
             <QuestionPanel
-              selectedId={selectedId}
+              questions={examData.questions}
+              answers={examData.answers}
+              selectedNumber={selectedNumber}
               expandedIds={expandedIds}
               onSelect={selectQuestion}
               onToggleExpand={toggleExpand}
@@ -167,7 +193,9 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
             className="min-h-0 min-w-0 flex-col"
           >
             <AnswerViewer
-              selectedId={selectedId}
+              answers={examData.answers}
+              answerSheetUrl={answerSheetUrl}
+              selectedNumber={selectedNumber}
               onSelect={selectQuestion}
               zoom={zoom}
               page={page}
@@ -176,7 +204,7 @@ export default function MappingWorkspace({ onBack }: MappingWorkspaceProps) {
               onZoomOut={handleZoomOut}
               onBack={onBack}
               setHighlightRef={setHighlightRef}
-              totalPages={TOTAL_PAGES}
+              totalPages={totalPages}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

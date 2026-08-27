@@ -2,10 +2,11 @@
 
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { MockQuestion } from "@/types/mapping";
+import type { Question } from "@/types/exam";
 
 interface QuestionCardProps {
-  question: MockQuestion;
+  question: Question;
+  hasAnswer: boolean;
   isSelected: boolean;
   isExpanded: boolean;
   onSelect: () => void;
@@ -14,14 +15,12 @@ interface QuestionCardProps {
 
 export default function QuestionCard({
   question,
+  hasAnswer,
   isSelected,
   isExpanded,
   onSelect,
   onToggleExpand,
 }: QuestionCardProps) {
-  const hasScore =
-    question.score && question.score !== "0/2" && question.score !== "0/5";
-
   return (
     <div
       onClick={onSelect}
@@ -35,32 +34,22 @@ export default function QuestionCard({
       <div className="flex items-start gap-3 p-3">
         <div
           className={cn(
-            "flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold",
+            "flex size-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
             isSelected
               ? "bg-[--color-veda-orange] text-white"
               : "bg-[--color-veda-dark] text-white",
           )}
         >
-          {question.id}
+          Q{question.number}
         </div>
 
         <div className="min-w-0 flex-1">
           <p className="text-[13px] font-medium leading-snug text-foreground">
-            {question.question}
+            {question.text}
           </p>
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-1">
-          {question.score && (
-            <span
-              className={cn(
-                "text-xs font-semibold",
-                hasScore ? "text-[--color-veda-green]" : "text-red-400",
-              )}
-            >
-              {question.score}
-            </span>
-          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -81,36 +70,16 @@ export default function QuestionCard({
 
       {isExpanded && (
         <div className="animate-fade-in border-t border-[--color-border] px-3 pb-3 pt-3">
-          {question.status === "review" && question.feedback && (
-            <div className="rounded-xl border border-orange-200 bg-[--color-veda-orange-soft] p-3">
-              <p className="mb-1 text-xs font-bold text-[--color-veda-orange]">
-                AI Feedback
-              </p>
-              <p className="text-[13px] leading-relaxed text-foreground">
-                {question.feedback}
-              </p>
-            </div>
-          )}
-          {question.status === "mapped" && question.answerExcerpt && (
-            <div className="rounded-xl bg-gray-50 p-3">
-              <p className="mb-1 text-xs font-semibold text-foreground">
-                Mapped to Answer Sheet
-                {question.answerRegion && (
-                  <span className="font-normal text-muted-foreground">
-                    {" "}
-                    &middot; Page {question.answerRegion.page}
-                  </span>
-                )}
-              </p>
-              <p className="text-[13px] leading-relaxed text-muted-foreground italic">
-                &quot;{question.answerExcerpt}&quot;
-              </p>
-            </div>
-          )}
-          {question.status === "unmapped" && (
+          {hasAnswer ? (
             <div className="rounded-xl bg-gray-50 p-3">
               <p className="text-[13px] text-muted-foreground">
-                No matching region found in the answer sheet.
+                Answer region detected on the answer sheet.
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-xl bg-gray-50 p-3">
+              <p className="text-[13px] text-muted-foreground">
+                No matching answer region found on the answer sheet.
               </p>
             </div>
           )}

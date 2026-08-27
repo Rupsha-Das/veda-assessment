@@ -9,9 +9,11 @@ import StartMappingButton from "./StartMappingButton";
 interface UploadPageProps {
   questionPaper: UploadedFileMeta | null;
   answerSheet: UploadedFileMeta | null;
-  onUpload: (kind: "question" | "answer", file: UploadedFileMeta) => void;
+  onUpload: (kind: "question" | "answer", file: UploadedFileMeta, raw: File) => void;
   onRemove: (kind: "question" | "answer") => void;
   onStartMapping: () => void;
+  bothUploaded: boolean;
+  processingError: string | null;
 }
 
 export default function UploadPage({
@@ -20,18 +22,18 @@ export default function UploadPage({
   onUpload,
   onRemove,
   onStartMapping,
+  bothUploaded,
+  processingError,
 }: UploadPageProps) {
   const [questionError, setQuestionError] = useState<string | null>(null);
   const [answerError, setAnswerError] = useState<string | null>(null);
 
   const handleUpload = useCallback(
-    (kind: "question" | "answer", file: UploadedFileMeta) => {
-      onUpload(kind, file);
+    (kind: "question" | "answer", file: UploadedFileMeta, raw: File) => {
+      onUpload(kind, file, raw);
     },
     [onUpload],
   );
-
-  const bothUploaded = questionPaper !== null && answerSheet !== null;
 
   return (
     <div className="flex min-h-full flex-col items-center px-4 py-8 md:py-12">
@@ -62,7 +64,7 @@ export default function UploadPage({
           }
           file={questionPaper}
           error={questionError}
-          onFileSelected={(f) => handleUpload("question", f)}
+          onFileSelected={(f, raw) => handleUpload("question", f, raw)}
           onRemove={() => onRemove("question")}
           onError={setQuestionError}
         />
@@ -76,7 +78,7 @@ export default function UploadPage({
           }
           file={answerSheet}
           error={answerError}
-          onFileSelected={(f) => handleUpload("answer", f)}
+          onFileSelected={(f, raw) => handleUpload("answer", f, raw)}
           onRemove={() => onRemove("answer")}
           onError={setAnswerError}
         />
@@ -87,6 +89,9 @@ export default function UploadPage({
           disabled={!bothUploaded}
           onClick={onStartMapping}
         />
+        {processingError && (
+          <p className="text-center text-sm text-red-500">{processingError}</p>
+        )}
         <p className="text-center text-xs text-muted-foreground">
           Once both files are uploaded, you&apos;ll be able to map answers
           with questions

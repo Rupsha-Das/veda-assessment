@@ -1,0 +1,207 @@
+import type { OCRBlock, Question, AnswerGroup } from "@/types/exam";
+import type { SegmentationResult, AnswerAssociation } from "./segmentAnswersWithOpenAI";
+import {
+  buildRegionsFromBlocks,
+  isSuspiciousTinyAnswer,
+  isLikelyTopLevelQuestionBlock,
+} from "./extractAnswers";
+
+export type ValidatedSegmentation = {
+  answers: AnswerAssociation[];
+  unassignedBlockIds: string[];
+  method: "openai" | "deterministic-fallback";
+};
+
+export function validateSegmentation({
+  segmentation,
+  questions,
+  blocks,
+}: {
+  segmentation: SegmentationResult;
+  questions: Question[];
+  blocks: OCRBlock[];
+}): ValidatedSegmentation {
+  const validBlockIds = new Set(blocks.map((b) => b.id));
+  const validQuestionNumbers = new Set(questions.map((q) => q.number));
+  const assignedBlocks = new Set<string>();
+  const blockMap = new Map(blocks.map((b) => [b.id, b]));
+
+  const validatedAnswers: AnswerAssociation[] = [];
+
+  for (const answer of segmentation.answers) {
+    if (!validQuestionNumbers.has(answer.questionNumber)) {
+      console.warn(
+        `[validate] Discarding answer for unknown question Q${answer.questionNumber}`,
+      );
+      continue;
+    }
+
+    const firstBlock = answer.blockIds
+      .map((id) => blockMap.get(id))
+      .find((block): block is OCRBlock => block !== undefined);
+
+    // Protect the parent answer when a model mistakes a nested list item for
+    // a question (for example, "1. Rate Limiting" mapped to Q1).
+    if (
+      firstBlock &&
+      /^\d{1,3}\s*[.):]\s*/.test(firstBlock.text.trim()) &&
+      !isLikelyTopLevelQuestionBlock(firstBlock.text, questions)
+    ) {
+      console.warn(
+        `[validate] Discarding nested numbered list incorrectly mapped to Q${answer.questionNumber}`,
+      );
+      continue;
+    }
+
+    if (isSuspiciousTinyAnswer(answer.blockIds, blockMap)) {
+      console.warn(
+        `[validate] Discarding suspicious tiny answer for Q${answer.questionNumber} (only bare number content)`,
+      );
+      continue;
+    }
+
+    const validIds: string[] = [];
+    for (const blockId of answer.blockIds) {
+      if (!validBlockIds.has(blockId)) {
+        console.warn(`[validate] Discarding invalid block ID: ${blockId}`);
+        continue;
+      }
+      if (assignedBlocks.has(blockId)) {
+        console.warn(`[validate] Discarding duplicate block ID: ${blockId}`);
+        continue;
+      }
+      assignedBlocks.add(blockId);
+      validIds.push(blockId);
+    }
+
+    if (validIds.length > 0) {
+      validatedAnswers.push({
+        questionNumber: answer.questionNumber,
+        blockIds: validIds,
+        confidence: answer.confidence,
+      });
+    }
+  }
+
+  const unassignedBlockIds = blocks
+    .filter((b) => !assignedBlocks.has(b.id))
+    .map((b) => b.id);
+
+  return {
+    answers: validatedAnswers,
+    unassignedBlockIds,
+    method: "openai",
+  };
+}
+
+export function segmentAnswersDeterministically({
+  questions,
+  blocks,
+}: {
+  questions: Question[];
+  blocks: OCRBlock[];
+}): ValidatedSegmentation {
+  const Q_MARKER_RE = /^q\s*\.?\s*(\d{1,3})\s*[.):\-]?\s*/i;
+
+  type PendingGroup = {
+    number: string;
+    blockIds: string[];
+  };
+
+  const groups: PendingGroup[] = [];
+  let current: PendingGroup | null = null;
+
+  for (const block of blocks) {
+    const trimmed = block.text.trim();
+    let marker: string | null = null;
+
+    const qMatch = trimmed.match(Q_MARKER_RE);
+    if (qMatch) {
+      marker = qMatch[1];
+    } else {
+      const lines = trimmed.split(/\n/);
+      for (const line of lines) {
+        const lt = line.trim();
+        if (lt.length > 30) continue;
+        const m = lt.match(Q_MARKER_RE);
+        if (m) { marker = m[1]; break; }
+      }
+    }
+
+    if (marker) {
+      current = { number: marker, blockIds: [block.id] };
+      groups.push(current);
+    } else {
+      const topLevelNumber = isLikelyTopLevelQuestionBlock(trimmed, questions);
+      if (topLevelNumber) {
+        current = { number: topLevelNumber, blockIds: [block.id] };
+        groups.push(current);
+      } else if (current) {
+        // Numbered lists, lettered sub-points, bullets, and examples belong
+        // to the active answer unless a real question header was identified.
+        current.blockIds.push(block.id);
+      }
+    }
+  }
+
+  const validQuestionNumbers = new Set(questions.map((q) => q.number));
+  const assignedBlocks = new Set<string>();
+  const answers: AnswerAssociation[] = [];
+  const blockMap = new Map(blocks.map((b) => [b.id, b]));
+
+  for (const group of groups) {
+    if (!validQuestionNumbers.has(group.number)) continue;
+    if (isSuspiciousTinyAnswer(group.blockIds, blockMap)) {
+      console.warn(
+        `[validate] Skipping suspicious tiny answer for Q${group.number} in fallback`,
+      );
+      continue;
+    }
+    const validIds = group.blockIds.filter((id) => {
+      if (assignedBlocks.has(id)) return false;
+      assignedBlocks.add(id);
+      return true;
+    });
+    if (validIds.length > 0) {
+      answers.push({
+        questionNumber: group.number,
+        blockIds: validIds,
+        confidence: 0.5,
+      });
+    }
+  }
+
+  const unassignedBlockIds = blocks
+    .filter((b) => !assignedBlocks.has(b.id))
+    .map((b) => b.id);
+
+  return {
+    answers,
+    unassignedBlockIds,
+    method: "deterministic-fallback",
+  };
+}
+
+export function buildAnswerGroups({
+  segmentation,
+  blocks,
+}: {
+  segmentation: ValidatedSegmentation;
+  blocks: OCRBlock[];
+}): AnswerGroup[] {
+  const blockMap = new Map(blocks.map((b) => [b.id, b]));
+
+  const answerGroups: AnswerGroup[] = [];
+
+  for (const answer of segmentation.answers) {
+    const regions = buildRegionsFromBlocks(answer.blockIds, blockMap);
+    if (regions.length > 0) {
+      answerGroups.push({
+        questionNumber: answer.questionNumber,
+        regions,
+      });
+    }
+  }
+
+  return answerGroups;
+}

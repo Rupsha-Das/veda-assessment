@@ -70,20 +70,20 @@ export default function AnswerToolbar({
           variant="ghost"
           size="icon-xs"
           onClick={onPrevPage}
-          disabled={page <= 1}
+          disabled={page <= 0}
           className="text-gray-700 hover:bg-gray-200"
           aria-label="Previous page"
         >
           <ChevronLeft />
         </Button>
         <span className="whitespace-nowrap text-sm text-gray-900">
-          Page {page} of {totalPages}
+          Page {page + 1} of {totalPages}
         </span>
         <Button
           variant="ghost"
           size="icon-xs"
           onClick={onNextPage}
-          disabled={page >= totalPages}
+          disabled={page >= totalPages - 1}
           className="text-gray-700 hover:bg-gray-200"
           aria-label="Next page"
         >

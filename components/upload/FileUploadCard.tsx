@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
-import { Upload, FileText, X, AlertCircle } from "lucide-react";
+import { Upload, X, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UploadedFileMeta } from "@/types/mapping";
 
@@ -10,7 +10,7 @@ interface FileUploadCardProps {
   label: React.ReactNode;
   file: UploadedFileMeta | null;
   error: string | null;
-  onFileSelected: (file: UploadedFileMeta) => void;
+  onFileSelected: (file: UploadedFileMeta, raw: File) => void;
   onRemove: () => void;
   onError: (error: string | null) => void;
 }
@@ -59,7 +59,7 @@ export default function FileUploadCard({
         onError(result);
       } else {
         onError(null);
-        onFileSelected(result);
+        onFileSelected(result, f);
       }
     },
     [validate, onFileSelected, onError],

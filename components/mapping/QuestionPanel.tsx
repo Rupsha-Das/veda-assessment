@@ -1,29 +1,36 @@
 "use client";
 
 import { ArrowLeft } from "lucide-react";
-import { mockQuestions } from "@/data/mockQuestions";
+import type { Question, AnswerGroup } from "@/types/exam";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import QuestionCard from "./QuestionCard";
 
 interface QuestionPanelProps {
-  selectedId: number | null;
-  expandedIds: Set<number>;
-  onSelect: (id: number) => void;
-  onToggleExpand: (id: number) => void;
+  questions: Question[];
+  answers: AnswerGroup[];
+  selectedNumber: string | null;
+  expandedIds: Set<string>;
+  onSelect: (id: string) => void;
+  onToggleExpand: (id: string) => void;
   onToggleAll: () => void;
   onBack?: () => void;
 }
 
 export default function QuestionPanel({
-  selectedId,
+  questions,
+  answers,
+  selectedNumber,
   expandedIds,
   onSelect,
   onToggleExpand,
   onToggleAll,
   onBack,
 }: QuestionPanelProps) {
-  const allExpanded = expandedIds.size === mockQuestions.length;
+  const allExpanded = expandedIds.size === questions.length;
+
+  const hasAnswer = (number: string) =>
+    answers.some((a) => a.questionNumber === number);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -57,16 +64,22 @@ export default function QuestionPanel({
       </div>
       <ScrollArea className="min-h-0 flex-1 p-3">
         <div className="flex flex-col gap-2">
-          {mockQuestions.map((q) => (
+          {questions.map((q) => (
             <QuestionCard
               key={q.id}
               question={q}
-              isSelected={q.id === selectedId}
+              hasAnswer={hasAnswer(q.number)}
+              isSelected={q.id === selectedNumber}
               isExpanded={expandedIds.has(q.id)}
               onSelect={() => onSelect(q.id)}
               onToggleExpand={() => onToggleExpand(q.id)}
             />
           ))}
+          {questions.length === 0 && (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              No questions could be extracted from the question paper.
+            </p>
+          )}
         </div>
       </ScrollArea>
     </div>
