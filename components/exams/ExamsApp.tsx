@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { UploadedFileMeta } from "@/types/mapping";
-import type { ProcessExamResponse } from "@/types/exam";
+import type { OCRDocument, ProcessExamResponse } from "@/types/exam";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import UploadPage from "@/components/upload/UploadPage";
 import ExtractionLoader from "@/components/loading/ExtractionLoader";
@@ -144,13 +144,23 @@ export default function ExamsApp() {
     setProcessingError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("questionPaper", questionFile);
-      formData.append("answerSheet", answerFile);
-
+      const uploadForOCR = async (file: File) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await fetch("/api/ocr", { method: "POST", body: formData });
+        const body = await response.json().catch(() => null) as { ocr?: OCRDocument; error?: string } | null;
+        if (!response.ok) throw new Error(body?.error ?? `Server error ${response.status}`);
+        if (!body?.ocr) throw new Error("The document could not be read.");
+        return body.ocr;
+      };
+      const [questionOCR, answerOCR] = await Promise.all([
+        uploadForOCR(questionFile),
+        uploadForOCR(answerFile),
+      ]);
       const res = await fetch("/api/process-exam", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questionOCR, answerOCR }),
       });
 
       if (!res.ok) {

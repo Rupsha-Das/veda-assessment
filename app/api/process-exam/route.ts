@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { runMistralOCR } from "@/lib/mistral/ocr";
 import { extractQuestions } from "@/lib/exam/extractQuestions";
 import { flattenAnswerBlocks } from "@/lib/exam/extractAnswers";
 import { segmentAnswersWithOpenAI } from "@/lib/exam/segmentAnswersWithOpenAI";
@@ -9,17 +8,10 @@ import {
   segmentAnswersDeterministically,
   buildAnswerGroups,
 } from "@/lib/exam/validateSegmentation";
-import type { ProcessExamResponse } from "@/types/exam";
+import type { OCRDocument, ProcessExamResponse } from "@/types/exam";
 
 export const runtime = "nodejs";
-
-const MAX_SIZE = 10 * 1024 * 1024;
-const ALLOWED_TYPES = new Set([
-  "application/pdf",
-  "image/png",
-  "image/jpeg",
-  "image/jpg",
-]);
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,41 +22,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const formData = await request.formData();
-    const questionPaper = formData.get("questionPaper") as File | null;
-    const answerSheet = formData.get("answerSheet") as File | null;
-
-    if (!questionPaper || !answerSheet) {
-      return NextResponse.json(
-        { error: "Both question paper and answer sheet are required." },
-        { status: 400 },
-      );
+    const body = (await request.json()) as { questionOCR?: unknown; answerOCR?: unknown };
+    const questionOCR = body.questionOCR as OCRDocument;
+    const answerOCR = body.answerOCR as OCRDocument;
+    if (!questionOCR?.pages || !answerOCR?.pages) {
+      return NextResponse.json({ error: "Both OCR documents are required." }, { status: 400 });
     }
-
-    if (
-      !ALLOWED_TYPES.has(questionPaper.type) ||
-      !ALLOWED_TYPES.has(answerSheet.type)
-    ) {
-      return NextResponse.json(
-        { error: "Unsupported file type. Please upload PDF, PNG, or JPEG." },
-        { status: 400 },
-      );
-    }
-
-    if (
-      questionPaper.size > MAX_SIZE ||
-      answerSheet.size > MAX_SIZE
-    ) {
-      return NextResponse.json(
-        { error: "File size exceeds the 10 MB limit." },
-        { status: 400 },
-      );
-    }
-
-    const [questionOCR, answerOCR] = await Promise.all([
-      runMistralOCR(questionPaper),
-      runMistralOCR(answerSheet),
-    ]);
 
     const questions = extractQuestions(questionOCR);
     const orderedBlocks = flattenAnswerBlocks(answerOCR);

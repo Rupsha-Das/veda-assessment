@@ -41,8 +41,8 @@ export default function FileUploadCard({
       if (f.type !== "application/pdf" && ext !== "pdf") {
         return "Only PDF files are supported.";
       }
-      if (f.size > 10 * 1024 * 1024) {
-        return "File size exceeds the 10 MB limit.";
+      if (f.size > 4 * 1024 * 1024) {
+        return "For production uploads, each file must be smaller than 4 MB.";
       }
       const pages = Math.max(2, Math.round(f.size / (1024 * 1024)));
       return { name: f.name, size: f.size, pages };
@@ -132,7 +132,7 @@ export default function FileUploadCard({
           </div>
           <div className="text-center">
             <p className="text-sm font-medium text-foreground">{label}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">Max 10MB</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">Max 4MB</p>
           </div>
         </label>
       )}
