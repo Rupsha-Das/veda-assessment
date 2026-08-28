@@ -58,15 +58,15 @@ export default function QuestionCard({
       className={cn(
         "cursor-pointer rounded-2xl border bg-white transition-all duration-150",
         isSelected
-          ? "border-[--color-veda-orange] shadow-sm"
+          ? "border-[#ff633d] shadow-[inset_0_0_0_1px_#ff633d]"
           : "border-[--color-border] hover:border-gray-300 hover:shadow-sm",
       )}
     >
       <div className="flex items-start gap-3 p-3">
         <div
           className={cn(
-            "flex min-w-7 shrink-0 items-center justify-center rounded-full bg-foreground px-1.5 text-[11px] font-bold text-background",
-            isSelected && "ring-2 ring-foreground/20 ring-offset-1",
+            "flex min-w-7 shrink-0 items-center justify-center rounded-full bg-foreground px-1.5 text-[11px] font-bold text-background transition-colors",
+            isSelected && "bg-[#ff633d] text-white ring-2 ring-[#ff633d]/20 ring-offset-1",
           )}
         >
           {question.number}
@@ -113,7 +113,7 @@ export default function QuestionCard({
       {isExpanded && (
         <div className="animate-fade-in border-t border-[--color-border] px-3 pb-3 pt-3">
           {question.feedback ? (
-            <div className="relative overflow-hidden rounded-xl border border-zinc-200/90 border-l-[3px] border-l-[--color-veda-orange] bg-gradient-to-br from-zinc-50 via-white to-zinc-100/80 p-4 shadow-[0_5px_18px_-12px_rgba(41,41,41,0.7)]">
+            <div className="relative overflow-hidden rounded-xl border border-zinc-200/90 border-l-2 border-l-[--color-veda-orange] bg-gradient-to-br from-zinc-50 via-white to-zinc-100/80 p-4 shadow-[0_5px_18px_-12px_rgba(41,41,41,0.7)]">
               <div className="mb-2 flex items-center gap-2">
                 <Sparkles className="size-4 text-[--color-veda-orange]" />
                 <p className="text-sm font-semibold text-foreground">
@@ -125,7 +125,7 @@ export default function QuestionCard({
               </p>
             </div>
           ) : hasAnswer ? (
-            <div className="relative overflow-hidden rounded-xl border border-zinc-200/90 border-l-[3px] border-l-zinc-400 bg-gradient-to-br from-zinc-50 via-white to-zinc-100/80 p-4 shadow-[0_5px_18px_-12px_rgba(41,41,41,0.7)]">
+            <div className="relative overflow-hidden rounded-xl border border-zinc-200/90 border-l-2 border-l-zinc-400 bg-gradient-to-br from-zinc-50 via-white to-zinc-100/80 p-4 shadow-[0_5px_18px_-12px_rgba(41,41,41,0.7)]">
               <div className="mb-2 flex items-center gap-2">
                 <Sparkles className="size-4 text-muted-foreground" />
                 <p className="text-sm font-semibold text-foreground">
