@@ -27,7 +27,7 @@ export default function Topbar({
   pageHeader,
 }: TopbarProps) {
   return (
-    <header className="flex h-12 shrink-0 items-center gap-2 bg-white px-3 sm:h-[60px] sm:px-3">
+    <header className="mx-3 mt-3 flex h-12 shrink-0 items-center gap-2 rounded-[20px] border border-[#e8e8e8] bg-white px-3 shadow-[0_4px_18px_rgba(0,0,0,0.04)] sm:h-[52px] sm:px-3">
       <Button
         variant="ghost"
         size="icon"
