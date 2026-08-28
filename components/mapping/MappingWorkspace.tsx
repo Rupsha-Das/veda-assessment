@@ -122,18 +122,18 @@ export default function MappingWorkspace({
       <Tabs
         value={mobileTab}
         onValueChange={setMobileTab}
-        className="flex min-h-0 min-w-0 flex-1 flex-col lg:hidden"
+        className="mx-1.5 my-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-sm lg:hidden"
       >
-        <TabsList className="mx-4 my-2 h-auto w-fit justify-start rounded-full bg-gray-200 p-1">
+        <TabsList className="mx-1.5 my-2 grid h-10 w-[calc(100%-0.75rem)] grid-cols-2 self-center rounded-full bg-[#ededed] p-1">
           <TabsTrigger
             value="questions"
-            className="rounded-full px-5 py-2 data-[active]:bg-[#292929] data-[active]:text-white"
+            className="h-full w-full min-w-0 rounded-full px-3 py-0 text-xs text-foreground data-[active]:bg-[#292929] data-[active]:text-white"
           >
             Questions
           </TabsTrigger>
           <TabsTrigger
             value="answer"
-            className="rounded-full px-5 py-2 data-[active]:bg-[#292929] data-[active]:text-white"
+            className="h-full w-full min-w-0 rounded-full px-3 py-0 text-xs text-foreground data-[active]:bg-[#292929] data-[active]:text-white"
           >
             Answer Sheet
           </TabsTrigger>

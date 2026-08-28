@@ -24,9 +24,9 @@ export default function AnswerToolbar({
   onNextPage,
 }: AnswerToolbarProps) {
   return (
-    <div className="flex shrink-0 items-center gap-2 border-b border-gray-200 bg-white px-3 py-2">
+    <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 border-b border-gray-200 bg-white px-2 py-2">
       {/* Zoom controls */}
-      <div className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1.5">
+      <div className="flex shrink-0 items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1.5">
         <Button
           variant="ghost"
           size="icon-xs"
@@ -37,7 +37,7 @@ export default function AnswerToolbar({
         >
           <ZoomOut />
         </Button>
-        <span className="min-w-[40px] text-center text-sm font-medium tabular-nums text-gray-900">
+        <span className="min-w-9 text-center text-sm font-medium tabular-nums text-gray-900">
           {zoom}%
         </span>
         <Button
@@ -53,7 +53,7 @@ export default function AnswerToolbar({
       </div>
 
       {/* Page navigation */}
-      <div className="flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1.5">
+      <div className="flex shrink-0 items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1.5">
         <Button
           variant="ghost"
           size="icon-xs"

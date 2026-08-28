@@ -33,7 +33,7 @@ export default function PageHeader({
         <button
           type="button"
           onClick={onBack}
-          className="rounded-md p-0.5 text-foreground transition-colors hover:bg-black/10"
+          className="flex size-8 items-center justify-center rounded-md p-0 text-foreground transition-colors hover:bg-black/10 sm:size-auto sm:p-0.5"
           aria-label="Back"
         >
           {arrow}

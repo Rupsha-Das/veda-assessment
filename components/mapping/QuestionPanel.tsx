@@ -29,8 +29,8 @@ export default function QuestionPanel({
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-      <div className="flex shrink-0 items-center justify-between border-b border-[--color-border] px-4 py-3">
-        <h2 className="text-[13px] font-semibold text-foreground">
+      <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[--color-border] px-3 py-3 lg:px-4 lg:py-3">
+        <h2 className="min-w-0 flex-1 truncate text-[13px] font-semibold text-foreground">
           Extracted Questions{" "}
           <span className="font-normal text-muted-foreground">
             (from question paper)
@@ -38,7 +38,7 @@ export default function QuestionPanel({
         </h2>
         <button
           onClick={onToggleAll}
-          className="rounded-lg border border-[--color-border] px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="shrink-0 rounded-lg border border-[--color-border] px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:px-2.5 lg:py-1.5"
         >
           {allExpanded ? "Collapse All" : "Expand All"}
         </button>

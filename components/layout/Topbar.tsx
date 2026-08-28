@@ -27,7 +27,7 @@ export default function Topbar({
   pageHeader,
 }: TopbarProps) {
   return (
-    <header className="flex h-[52px] shrink-0 items-center gap-2 bg-white px-3 sm:h-[60px]">
+    <header className="flex h-12 shrink-0 items-center gap-2 bg-white px-3 sm:h-[60px] sm:px-3">
       <Button
         variant="ghost"
         size="icon"
@@ -41,11 +41,11 @@ export default function Topbar({
       {pageHeader}
 
       {/* Right side */}
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex items-center gap-0.5 sm:gap-1">
         <Button
           variant="ghost"
           size="icon-sm"
-          className="text-foreground hover:bg-black/10"
+          className="hidden text-foreground hover:bg-black/10 sm:inline-flex"
           aria-label="Help"
         >
           <HelpCircle />
@@ -64,7 +64,7 @@ export default function Topbar({
         <Button
           variant="ghost"
           size="icon-sm"
-          className="text-foreground hover:bg-black/10"
+          className="hidden text-foreground hover:bg-black/10 sm:inline-flex"
           aria-label="AI tools"
         >
           <Sparkles />
@@ -72,10 +72,10 @@ export default function Topbar({
 
         <Button
           variant="ghost"
-          className="h-8 gap-1 rounded-full px-1.5 text-foreground hover:bg-black/10"
+          className="h-7 gap-1 rounded-full px-1 text-foreground hover:bg-black/10 sm:h-8 sm:px-1.5"
           aria-label="Open account menu"
         >
-          <Avatar size="sm" className="border-2 border-black/10">
+          <Avatar size="sm" className="size-6 border-2 border-black/10">
             <AvatarFallback className="bg-black/10 text-foreground text-xs">
               M
             </AvatarFallback>
@@ -88,7 +88,7 @@ export default function Topbar({
 
         <Button
           variant="ghost"
-          size="icon"
+          size="icon-sm"
           onClick={onOpenMobileSidebar}
           className="text-foreground hover:bg-black/10 lg:hidden"
           aria-label="Menu"
