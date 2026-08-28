@@ -131,13 +131,13 @@ export default function Sidebar({
         </div>
 
         {!collapsed ? (
-          <div className="mx-3 mt-2 mb-1 flex items-center gap-2.5 rounded-xl bg-[--color-veda-dark] px-3.5 py-2.5 text-[13px] font-medium text-white">
-            <Sparkles className="size-4 shrink-0 text-orange-400" />
+          <div className="mx-3 mt-2 mb-1 flex items-center gap-2.5 rounded-full border-2 border-[#ff633d] bg-[#292929] px-3.5 py-2.5 text-[13px] font-medium text-white">
+            <Sparkles className="size-4 shrink-0 text-[#ff633d]" />
             AI Teacher&apos;s Toolkit
           </div>
         ) : (
-          <div className="mx-auto mt-2 mb-1 flex size-9 items-center justify-center rounded-xl bg-[--color-veda-dark]">
-            <Sparkles className="size-4 text-orange-400" />
+          <div className="mx-auto mt-2 mb-1 flex size-9 items-center justify-center rounded-full border-2 border-[#ff633d] bg-[#292929]">
+            <Sparkles className="size-4 text-[#ff633d]" />
           </div>
         )}
 
@@ -171,8 +171,8 @@ export default function Sidebar({
                 VedaAI
               </span>
             </div>
-            <div className="mx-3 mt-2 mb-1 flex items-center gap-2.5 rounded-xl bg-[--color-veda-dark] px-3.5 py-2.5 text-[13px] font-medium text-white">
-              <Sparkles className="size-4 shrink-0 text-orange-400" />
+            <div className="mx-3 mt-2 mb-1 flex items-center gap-2.5 rounded-full border-2 border-[#ff633d] bg-[#292929] px-3.5 py-2.5 text-[13px] font-medium text-white">
+              <Sparkles className="size-4 shrink-0 text-[#ff633d]" />
               AI Teacher&apos;s Toolkit
             </div>
             <div className="mt-3 flex-1">
