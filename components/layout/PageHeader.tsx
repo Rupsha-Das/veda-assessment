@@ -44,7 +44,7 @@ export default function PageHeader({
       {Icon && (
         <Icon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
       )}
-      <span className="truncate text-sm font-medium text-[#858585]">{title}</span>
+      <span className="truncate text-sm font-medium text-foreground">{title}</span>
     </div>
   );
 }

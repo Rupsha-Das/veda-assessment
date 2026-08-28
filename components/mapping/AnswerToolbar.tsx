@@ -24,7 +24,7 @@ export default function AnswerToolbar({
   onNextPage,
 }: AnswerToolbarProps) {
   return (
-    <div className="flex h-14 shrink-0 flex-wrap items-center justify-center gap-2 border-b border-border bg-white px-4">
+    <div className="mx-3 mt-2 flex h-[52px] shrink-0 flex-wrap items-center justify-center gap-2 rounded-[20px] border border-border bg-white px-4 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
       {/* Zoom controls */}
       <div className="flex shrink-0 items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1.5">
         <Button

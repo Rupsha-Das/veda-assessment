@@ -29,7 +29,7 @@ export default function QuestionPanel({
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-      <div className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border bg-white px-4">
+      <div className="mx-3 mt-2 flex h-[52px] shrink-0 items-center justify-between gap-3 rounded-[20px] border border-border bg-white px-4 shadow-[0_4px_18px_rgba(0,0,0,0.04)] lg:mx-3 lg:mt-2">
         <h2 className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-none text-foreground">
           Extracted Questions{" "}
           <span className="font-normal text-muted-foreground">

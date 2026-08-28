@@ -76,7 +76,12 @@ function NavList({
 
 function SchoolProfile({ collapsed }: { collapsed: boolean }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-[--color-border] bg-white p-3 shadow-sm">
+    <div
+      className={cn(
+        "flex items-center rounded-2xl border border-[--color-border] bg-white shadow-sm",
+        collapsed ? "size-12 justify-center p-1" : "gap-3 p-3",
+      )}
+    >
       <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50">
         <svg viewBox="0 0 40 40" className="size-7" aria-hidden="true">
           <circle cx="20" cy="20" r="18" fill="#16a34a" opacity="0.15" />
@@ -152,7 +157,7 @@ export default function Sidebar({
           </div>
         )}
 
-        <div className="mx-3 mb-4">
+        <div className={cn("mb-4", collapsed ? "mx-auto" : "mx-3")}>
           <SchoolProfile collapsed={collapsed} />
         </div>
       </aside>
