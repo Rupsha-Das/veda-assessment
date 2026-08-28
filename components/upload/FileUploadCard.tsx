@@ -112,8 +112,8 @@ export default function FileUploadCard({
           className={cn(
             "flex w-full cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed bg-white p-4 transition-all",
             isDragging
-              ? "border-[--color-veda-orange] bg-[--color-veda-orange-soft]"
-              : "border-gray-200 hover:border-gray-300",
+              ? "border-[#ff633d] bg-[#fff1ec]"
+              : "border-gray-300 hover:border-gray-400",
           )}
         >
           <input

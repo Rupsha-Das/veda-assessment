@@ -39,7 +39,7 @@ export default function UploadPage({
     <div className="flex min-h-full flex-col items-center px-4 py-2 md:py-3">
       <h1 className="text-center text-2xl font-bold tracking-tight text-foreground md:text-[28px]">
         Upload{" "}
-        <span className="text-[--color-veda-orange]">
+        <span className="text-[#ff633d]">
           Question Paper &amp; Answer Sheets
         </span>
       </h1>
@@ -57,7 +57,7 @@ export default function UploadPage({
           label={
             <>
               Upload{" "}
-              <span className="text-[--color-veda-orange]">
+              <span className="text-[#ff633d]">
                 Question Paper
               </span>
             </>
@@ -73,7 +73,7 @@ export default function UploadPage({
           label={
             <>
               Upload{" "}
-              <span className="text-[--color-veda-orange]">Answer Sheet</span>
+              <span className="text-[#ff633d]">Answer Sheet</span>
             </>
           }
           file={answerSheet}
