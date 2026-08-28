@@ -113,7 +113,7 @@ export default function QuestionCard({
       {isExpanded && (
         <div className="animate-fade-in border-t border-[--color-border] px-3 pb-3 pt-3">
           {question.feedback ? (
-            <div className="rounded-xl border border-[--color-veda-orange-border] bg-[--color-veda-orange-soft] p-4">
+            <div className="relative overflow-hidden rounded-xl border border-zinc-200/90 border-l-[3px] border-l-[--color-veda-orange] bg-gradient-to-br from-zinc-50 via-white to-zinc-100/80 p-4 shadow-[0_5px_18px_-12px_rgba(41,41,41,0.7)]">
               <div className="mb-2 flex items-center gap-2">
                 <Sparkles className="size-4 text-[--color-veda-orange]" />
                 <p className="text-sm font-semibold text-foreground">
@@ -125,7 +125,7 @@ export default function QuestionCard({
               </p>
             </div>
           ) : hasAnswer ? (
-            <div className="rounded-xl border border-[--color-border] bg-gray-50 p-4">
+            <div className="relative overflow-hidden rounded-xl border border-zinc-200/90 border-l-[3px] border-l-zinc-400 bg-gradient-to-br from-zinc-50 via-white to-zinc-100/80 p-4 shadow-[0_5px_18px_-12px_rgba(41,41,41,0.7)]">
               <div className="mb-2 flex items-center gap-2">
                 <Sparkles className="size-4 text-muted-foreground" />
                 <p className="text-sm font-semibold text-foreground">
