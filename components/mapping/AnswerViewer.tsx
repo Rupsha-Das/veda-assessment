@@ -16,7 +16,6 @@ interface AnswerViewerProps {
   setPage: (p: number) => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
-  onBack: () => void;
   setHighlightRef: (id: string, el: HTMLButtonElement | null) => void;
   totalPages: number;
 }
@@ -31,7 +30,6 @@ export default function AnswerViewer({
   setPage,
   onZoomIn,
   onZoomOut,
-  onBack,
   setHighlightRef,
   totalPages,
 }: AnswerViewerProps) {
@@ -93,7 +91,6 @@ export default function AnswerViewer({
         onZoomOut={onZoomOut}
         onPrevPage={() => setPage(Math.max(0, page - 1))}
         onNextPage={() => setPage(Math.min(totalPages - 1, page + 1))}
-        onBack={onBack}
       />
 
       <div

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { FileCheck } from "lucide-react";
 import type { UploadedFileMeta } from "@/types/mapping";
 import type { OCRDocument, ProcessExamResponse } from "@/types/exam";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import PageHeader from "@/components/layout/PageHeader";
 import UploadPage from "@/components/upload/UploadPage";
 import ExtractionLoader from "@/components/loading/ExtractionLoader";
 import MappingWorkspace from "@/components/mapping/MappingWorkspace";
@@ -221,7 +223,13 @@ export default function ExamsApp() {
       <DashboardLayout
         sidebarCollapsed={sidebarCollapsed}
         onToggleSidebar={() => setSidebarCollapsed((v) => !v)}
-        onBack={screen === "mapping" ? handleBackToUpload : undefined}
+        pageHeader={
+          <PageHeader
+            title="Exams"
+            icon={FileCheck}
+            onBack={screen === "mapping" ? handleBackToUpload : undefined}
+          />
+        }
       >
         {screen === "upload" && (
           <UploadPage
@@ -238,11 +246,10 @@ export default function ExamsApp() {
           <MappingWorkspace
             examData={examData}
             answerSheetUrl={answerSheetUrl}
-            onBack={handleBackToUpload}
           />
         )}
+        {screen === "loading" && <ExtractionLoader onDone={() => {}} />}
       </DashboardLayout>
-      {screen === "loading" && <ExtractionLoader onDone={() => {}} />}
     </>
   );
 }

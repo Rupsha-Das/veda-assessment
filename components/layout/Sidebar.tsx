@@ -55,7 +55,7 @@ function NavList({
           className={cn(
             "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all",
             item.active
-              ? "bg-gray-100 text-foreground"
+              ? "bg-[#F1F1F1] text-foreground"
               : "text-muted-foreground hover:bg-gray-50 hover:text-foreground",
           )}
         >
@@ -117,7 +117,7 @@ export default function Sidebar({
       {/* Desktop */}
       <aside
         className={cn(
-          "hidden flex-col rounded-r-3xl border-r border-[--color-border] bg-white transition-all duration-200 lg:flex",
+          "hidden flex-col rounded-r-3xl border-r border-[--color-border] bg-white shadow-sm transition-all duration-200 lg:flex",
           collapsed ? "w-[68px]" : "w-64",
         )}
       >

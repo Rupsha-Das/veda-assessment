@@ -37,7 +37,7 @@ export default function UploadPage({
 
   return (
     <div className="flex min-h-full flex-col items-center px-4 py-2 md:py-3">
-      <h1 className="text-center text-2xl font-bold tracking-tight text-foreground md:text-[28px]">
+      <h1 className="font-heading text-center text-2xl font-bold tracking-[-0.03em] text-foreground md:text-[28px]">
         Upload{" "}
         <span className="text-[#ff633d]">
           Question Paper &amp; Answer Sheets

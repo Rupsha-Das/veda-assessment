@@ -13,7 +13,7 @@ export default function ExtractionLoader({ onDone }: ExtractionLoaderProps) {
   }, [onDone]);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
+    <div className="absolute inset-2 z-10 flex flex-col items-center justify-center rounded-3xl bg-white shadow-sm sm:inset-3 md:inset-4">
       {/* Sparkle stars */}
       <div className="relative">
         <svg

@@ -8,14 +8,14 @@ interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarCollapsed: boolean;
   onToggleSidebar: () => void;
-  onBack?: () => void;
+  pageHeader?: React.ReactNode;
 }
 
 export default function DashboardLayout({
   children,
   sidebarCollapsed,
   onToggleSidebar,
-  onBack,
+  pageHeader,
 }: DashboardLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -39,9 +39,11 @@ export default function DashboardLayout({
           sidebarCollapsed={sidebarCollapsed}
           onToggleSidebar={onToggleSidebar}
           onOpenMobileSidebar={() => setMobileOpen(true)}
-          onBack={onBack}
+          pageHeader={pageHeader}
         />
-        <main className="min-h-0 flex-1 overflow-y-auto">{children}</main>
+        <main className="relative min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(180deg,#f7f7f7_0%,#ededed_46%,#c7c7c7_100%)]">
+          {children}
+        </main>
       </div>
     </div>
   );

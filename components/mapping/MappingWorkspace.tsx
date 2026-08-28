@@ -16,13 +16,11 @@ import AnswerViewer from "./AnswerViewer";
 interface MappingWorkspaceProps {
   examData: ProcessExamResponse;
   answerSheetUrl: string;
-  onBack: () => void;
 }
 
 export default function MappingWorkspace({
   examData,
   answerSheetUrl,
-  onBack,
 }: MappingWorkspaceProps) {
   const [selectedNumber, setSelectedNumber] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -153,7 +151,6 @@ export default function MappingWorkspace({
             onSelect={handleMobileTabSelect}
             onToggleExpand={toggleExpand}
             onToggleAll={toggleAll}
-            onBack={onBack}
           />
         </TabsContent>
 
@@ -171,7 +168,6 @@ export default function MappingWorkspace({
             setPage={setPage}
             onZoomIn={handleZoomIn}
             onZoomOut={handleZoomOut}
-            onBack={onBack}
             setHighlightRef={setAnswerHighlightRef}
             totalPages={totalPages}
           />
@@ -197,7 +193,6 @@ export default function MappingWorkspace({
               onSelect={selectQuestion}
               onToggleExpand={toggleExpand}
               onToggleAll={toggleAll}
-              onBack={onBack}
             />
           </ResizablePanel>
 
@@ -218,7 +213,6 @@ export default function MappingWorkspace({
               setPage={setPage}
               onZoomIn={handleZoomIn}
               onZoomOut={handleZoomOut}
-              onBack={onBack}
               setHighlightRef={setAnswerHighlightRef}
               totalPages={totalPages}
             />
