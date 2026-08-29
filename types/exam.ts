@@ -54,6 +54,7 @@ export type Question = {
   id: string;
   number: string;
   text: string;
+  page?: number;
   maxMarks?: number;
   marksObtained?: number;
   feedback?: string;

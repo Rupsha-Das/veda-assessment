@@ -4,6 +4,7 @@ import {
   buildRegionsFromBlocks,
   isSuspiciousTinyAnswer,
   isLikelyTopLevelQuestionBlock,
+  detectBareAnswerNumber,
 } from "./extractAnswers";
 
 export type ValidatedSegmentation = {
@@ -23,13 +24,24 @@ export function validateSegmentation({
 }): ValidatedSegmentation {
   const validBlockIds = new Set(blocks.map((b) => b.id));
   const validQuestionNumbers = new Set(questions.map((q) => q.number));
+  const validBaseNumbers = new Set(
+    questions.map((q) => {
+      const base = q.number.match(/^(\d{1,3})/)?.[1];
+      return base ?? q.number;
+    }),
+  );
   const assignedBlocks = new Set<string>();
   const blockMap = new Map(blocks.map((b) => [b.id, b]));
 
   const validatedAnswers: AnswerAssociation[] = [];
 
   for (const answer of segmentation.answers) {
-    if (!validQuestionNumbers.has(answer.questionNumber)) {
+    const answerBaseNumber = answer.questionNumber.match(/^(\d{1,3})/)?.[1] ?? answer.questionNumber;
+    const isValidQuestion =
+      validQuestionNumbers.has(answer.questionNumber) ||
+      validBaseNumbers.has(answerBaseNumber);
+
+    if (!isValidQuestion) {
       console.warn(
         `[validate] Discarding answer for unknown question Q${answer.questionNumber}`,
       );
@@ -40,17 +52,23 @@ export function validateSegmentation({
       .map((id) => blockMap.get(id))
       .find((block): block is OCRBlock => block !== undefined);
 
-    // Protect the parent answer when a model mistakes a nested list item for
-    // a question (for example, "1. Rate Limiting" mapped to Q1).
     if (
       firstBlock &&
       /^\d{1,3}\s*[.):]\s*/.test(firstBlock.text.trim()) &&
       !isLikelyTopLevelQuestionBlock(firstBlock.text, questions)
     ) {
-      console.warn(
-        `[validate] Discarding nested numbered list incorrectly mapped to Q${answer.questionNumber}`,
-      );
-      continue;
+      const bare = detectBareAnswerNumber(firstBlock.text);
+      if (
+        bare &&
+        (validQuestionNumbers.has(bare) || validBaseNumbers.has(bare))
+      ) {
+        // Bare number is valid - keep it
+      } else {
+        console.warn(
+          `[validate] Discarding nested numbered list incorrectly mapped to Q${answer.questionNumber}`,
+        );
+        continue;
+      }
     }
 
     if (isSuspiciousTinyAnswer(answer.blockIds, blockMap)) {
@@ -136,21 +154,43 @@ export function segmentAnswersDeterministically({
       if (topLevelNumber) {
         current = { number: topLevelNumber, blockIds: [block.id] };
         groups.push(current);
-      } else if (current) {
-        // Numbered lists, lettered sub-points, bullets, and examples belong
-        // to the active answer unless a real question header was identified.
-        current.blockIds.push(block.id);
+      } else {
+        const bareNumber = detectBareAnswerNumber(trimmed);
+        if (bareNumber) {
+          const validQuestion = questions.find((q) => q.number === bareNumber);
+          const validBaseQuestion = questions.find((q) => {
+            const base = q.number.match(/^(\d{1,3})/)?.[1];
+            return base === bareNumber;
+          });
+          if (validQuestion || validBaseQuestion) {
+            current = { number: bareNumber, blockIds: [block.id] };
+            groups.push(current);
+          } else if (current) {
+            current.blockIds.push(block.id);
+          }
+        } else if (current) {
+          current.blockIds.push(block.id);
+        }
       }
     }
   }
 
   const validQuestionNumbers = new Set(questions.map((q) => q.number));
+  const validBaseNumbers = new Set(
+    questions.map((q) => {
+      const base = q.number.match(/^(\d{1,3})/)?.[1];
+      return base ?? q.number;
+    }),
+  );
   const assignedBlocks = new Set<string>();
   const answers: AnswerAssociation[] = [];
   const blockMap = new Map(blocks.map((b) => [b.id, b]));
 
   for (const group of groups) {
-    if (!validQuestionNumbers.has(group.number)) continue;
+    const groupBaseNumber = group.number.match(/^(\d{1,3})/)?.[1] ?? group.number;
+    const isValid =
+      validQuestionNumbers.has(group.number) || validBaseNumbers.has(groupBaseNumber);
+    if (!isValid) continue;
     if (isSuspiciousTinyAnswer(group.blockIds, blockMap)) {
       console.warn(
         `[validate] Skipping suspicious tiny answer for Q${group.number} in fallback`,

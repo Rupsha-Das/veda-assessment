@@ -24,8 +24,12 @@ export default function QuestionPanel({
 }: QuestionPanelProps) {
   const allExpanded = expandedIds.size === questions.length;
 
-  const hasAnswer = (number: string) =>
-    answers.some((a) => a.questionNumber === number);
+  const hasAnswer = (number: string) => {
+    const baseNumber = number.match(/^(\d{1,3})/)?.[1] ?? number;
+    return answers.some(
+      (a) => a.questionNumber === number || a.questionNumber === baseNumber,
+    );
+  };
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">

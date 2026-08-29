@@ -34,14 +34,12 @@ function hasQuestionTextOverlap(blockText: string, questionText: string) {
     if (questionWords.has(word)) overlap += 1;
   }
 
-  return overlap / Math.min(blockWords.size, questionWords.size) >= 0.35;
+  return overlap / Math.min(blockWords.size, questionWords.size) >= 0.2;
 }
 
 /**
- * Bare numbers are ambiguous on answer sheets. They can be question headers,
- * but they are much more commonly list items inside the preceding answer.
- * Only promote one to a question boundary when its text also resembles the
- * corresponding question from the question paper.
+ * Detect whether a block is the start of an answer for a specific question.
+ * Uses bare number detection with relaxed validation for answer sheets.
  */
 export function isLikelyTopLevelQuestionBlock(
   text: string,
@@ -52,12 +50,17 @@ export function isLikelyTopLevelQuestionBlock(
 
   const number = match[1];
   const content = text.trim().slice(match[0].length).trim();
-  if (content.length < 12) return null;
 
   const question = questions.find((item) => item.number === number);
   if (!question) return null;
 
-  return hasQuestionTextOverlap(content, question.text) ? number : null;
+  if (content.length >= 3) {
+    return hasQuestionTextOverlap(content, question.text) ? number : null;
+  }
+
+  if (content.length === 0) return number;
+
+  return number;
 }
 
 export function detectExplicitMarker(text: string): string | null {
@@ -77,20 +80,34 @@ export function detectExplicitMarker(text: string): string | null {
   return null;
 }
 
+export function detectBareAnswerNumber(text: string): string | null {
+  const trimmed = text.trim();
+
+  if (trimmed.length > 40) return null;
+
+  const firstLine = trimmed.split(/\n/)[0]?.trim() ?? "";
+  if (firstLine.length > 40) return null;
+
+  const m = firstLine.match(BARE_NUMBER_RE);
+  if (!m) return null;
+
+  const content = firstLine.slice(m[0].length).trim();
+
+  if (content.length === 0) return m[1];
+
+  if (content.length > 2) return m[1];
+
+  return null;
+}
+
 export function detectMarkerHint(text: string): MarkerHint {
   const explicit = detectExplicitMarker(text);
   if (explicit) {
     return { type: "explicit_question", questionNumber: explicit };
   }
 
-  const trimmed = text.trim();
-  if (trimmed.length <= 25) {
-    const firstLine = trimmed.split(/\n/)[0]?.trim() ?? "";
-    if (firstLine.length <= 25) {
-      const bareMatch = firstLine.match(BARE_NUMBER_RE);
-      if (bareMatch) return { type: "bare_number", number: bareMatch[1] };
-    }
-  }
+  const bare = detectBareAnswerNumber(text);
+  if (bare) return { type: "bare_number", number: bare };
 
   return null;
 }
@@ -114,7 +131,11 @@ export function isSuspiciousTinyAnswer(
     .join(" ")
     .trim();
 
-  return /^\d{1,3}[.)]?$/.test(text);
+  if (/^\d{1,3}[.)]?$/.test(text)) return true;
+
+  if (text.length < 3 && blocks.length === 1) return true;
+
+  return false;
 }
 
 const IGNORED_TYPES = new Set(["header", "footer"]);

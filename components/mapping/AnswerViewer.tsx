@@ -64,9 +64,10 @@ export default function AnswerViewer({
   const highlightsOnPage = useMemo(() => {
     if (selectedNumber === null) return [];
 
-    const answer = answers.find(
-      (item) => item.questionNumber === selectedNumber,
-    );
+    const baseNumber = selectedNumber.match(/^(\d{1,3})/)?.[1] ?? selectedNumber;
+    const answer =
+      answers.find((item) => item.questionNumber === selectedNumber) ??
+      answers.find((item) => item.questionNumber === baseNumber);
     const region = answer?.regions.find((item) => item.pageIndex === page);
 
     return region

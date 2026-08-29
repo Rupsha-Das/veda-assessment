@@ -37,9 +37,9 @@ export async function POST(request: NextRequest) {
 
     let segmentation;
 
-    if (process.env.OPENAI_API_KEY && questions.length > 0 && orderedBlocks.length > 0) {
+    if (process.env.OPENROUTER_API_KEY && questions.length > 0 && orderedBlocks.length > 0) {
       try {
-        console.log("[process-exam] Attempting OpenAI segmentation...");
+        console.log("[process-exam] Attempting OpenRouter segmentation...");
         const rawSegmentation = await segmentAnswersWithOpenAI({
           questions,
           blocks: orderedBlocks,
@@ -49,16 +49,16 @@ export async function POST(request: NextRequest) {
           questions,
           blocks: orderedBlocks,
         });
-        console.log(`[process-exam] OpenAI segmentation succeeded: ${segmentation.answers.length} answer groups`);
+        console.log(`[process-exam] OpenRouter segmentation succeeded: ${segmentation.answers.length} answer groups`);
       } catch (error: unknown) {
-        console.error("[process-exam] OpenAI segmentation failed, falling back to deterministic:", error);
+        console.error("[process-exam] OpenRouter segmentation failed, falling back to deterministic:", error);
         segmentation = segmentAnswersDeterministically({
           questions,
           blocks: orderedBlocks,
         });
       }
     } else {
-      console.log("[process-exam] Using deterministic segmentation (no OpenAI key or no data)");
+      console.log("[process-exam] Using deterministic segmentation (no OpenRouter key or no data)");
       segmentation = segmentAnswersDeterministically({
         questions,
         blocks: orderedBlocks,
@@ -85,8 +85,13 @@ export async function POST(request: NextRequest) {
           segmentation.answers.map((answer) => answer.questionNumber),
         );
         evaluatedQuestions = questions.map((question) => {
-          const evaluation = evaluationByNumber.get(question.number);
-          return evaluation && matchedNumbers.has(question.number)
+          const baseNumber = question.number.match(/^(\d{1,3})/)?.[1] ?? question.number;
+          const evaluation =
+            evaluationByNumber.get(question.number) ??
+            evaluationByNumber.get(baseNumber);
+          const isMatched =
+            matchedNumbers.has(question.number) || matchedNumbers.has(baseNumber);
+          return evaluation && isMatched
             ? { ...question, ...evaluation }
             : question;
         });

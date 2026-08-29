@@ -47,12 +47,18 @@ export default function MappingWorkspace({
     null;
 
   const selectAnswerQuestion = (number: string) => {
-    const question = examData.questions.find((item) => item.number === number);
+    const baseNumber = number.match(/^(\d{1,3})/)?.[1] ?? number;
+    const question =
+      examData.questions.find((item) => item.number === number) ??
+      examData.questions.find((item) => item.number === baseNumber);
     if (question) selectQuestion(question.id);
   };
 
   const setAnswerHighlightRef = (number: string, el: HTMLButtonElement | null) => {
-    const question = examData.questions.find((item) => item.number === number);
+    const baseNumber = number.match(/^(\d{1,3})/)?.[1] ?? number;
+    const question =
+      examData.questions.find((item) => item.number === number) ??
+      examData.questions.find((item) => item.number === baseNumber);
     setHighlightRef(question?.id ?? number, el);
   };
 
@@ -84,9 +90,10 @@ export default function MappingWorkspace({
   };
 
   const findFirstRegion = (questionNumber: string) => {
-    const answer = examData.answers.find(
-      (a) => a.questionNumber === questionNumber,
-    );
+    const baseNumber = questionNumber.match(/^(\d{1,3})/)?.[1] ?? questionNumber;
+    const answer =
+      examData.answers.find((a) => a.questionNumber === questionNumber) ??
+      examData.answers.find((a) => a.questionNumber === baseNumber);
     if (!answer || answer.regions.length === 0) return null;
     return answer.regions[0];
   };

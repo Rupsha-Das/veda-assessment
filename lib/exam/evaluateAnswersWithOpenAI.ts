@@ -1,10 +1,6 @@
-import OpenAI from "openai";
 import type { OCRBlock, Question } from "@/types/exam";
+import { openrouterJson } from "@/lib/openrouter/client";
 import type { AnswerAssociation } from "./segmentAnswersWithOpenAI";
-
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
 
 export type QuestionEvaluation = {
   questionNumber: string;
@@ -94,19 +90,26 @@ function evaluateLocally(
   blocks: OCRBlock[],
 ): QuestionEvaluation[] {
   const blockMap = new Map(blocks.map((block) => [block.id, block]));
-  const answerByNumber = new Map(
-    answers.map((answer) => [
-      answer.questionNumber,
-      answer.blockIds
-        .map((id) => blockMap.get(id)?.text)
-        .filter(Boolean)
-        .join(" "),
-    ]),
-  );
+  const answerByNumber = new Map<
+    string,
+    { text: string; baseNumber: string }
+  >();
+
+  for (const answer of answers) {
+    const text = answer.blockIds
+      .map((id) => blockMap.get(id)?.text)
+      .filter(Boolean)
+      .join(" ");
+    const baseNumber = answer.questionNumber.match(/^(\d{1,3})/)?.[1] ?? answer.questionNumber;
+    answerByNumber.set(answer.questionNumber, { text, baseNumber });
+  }
 
   return questions.map((question) => {
     const maximum = defaultMaxMarks(question);
-    const answer = answerByNumber.get(question.number)?.trim() ?? "";
+    const baseNumber = question.number.match(/^(\d{1,3})/)?.[1] ?? question.number;
+    const answerEntry =
+      answerByNumber.get(question.number) ?? answerByNumber.get(baseNumber);
+    const answer = answerEntry?.text.trim() ?? "";
     const questionWords = new Set(words(question.text));
     const answerWords = new Set(words(answer));
     const matched = [...questionWords].filter((word) => answerWords.has(word));
@@ -150,11 +153,12 @@ export async function evaluateAnswersWithOpenAI({
       .join("\n"),
   }));
 
-  if (!openai) return evaluateLocally(questions, answers, blocks);
+  if (!process.env.OPENROUTER_API_KEY) return evaluateLocally(questions, answers, blocks);
 
   try {
-    const response = await openai.responses.parse({
-    model: "gpt-4o",
+    const parsed = await openrouterJson<{
+      evaluations: QuestionEvaluation[];
+    }>({
     instructions: `Evaluate each answer against its question.
 
 - Infer the maximum marks from the question's stated marks when present; otherwise use the most appropriate whole-number value for the question.
@@ -172,23 +176,8 @@ export async function evaluateAnswersWithOpenAI({
       })),
       answers: answerText,
     }),
-    text: {
-      format: {
-        type: "json_schema",
-        name: "answer_evaluations",
-        strict: true,
-        schema: EVALUATION_SCHEMA,
-      },
-    },
-    reasoning: { effort: "low" },
-    temperature: 0,
+    schema: EVALUATION_SCHEMA,
     });
-
-  const parsed = response.output_parsed as {
-    evaluations: QuestionEvaluation[];
-  } | null;
-
-    if (!parsed) throw new Error("OpenAI returned empty evaluation output");
 
     return parsed.evaluations.map((evaluation) => {
     const maxMarks = Math.max(0, Math.round(evaluation.maxMarks));
