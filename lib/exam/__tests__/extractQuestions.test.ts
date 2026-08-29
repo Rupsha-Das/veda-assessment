@@ -163,6 +163,20 @@ describe("extractQuestions", () => {
       expect(numbers).toContain("2");
     });
 
+    it("ignores common numbered paper instructions from OCR", () => {
+      const doc = makeDoc([
+        [
+          { text: "1. What is photosynthesis?" },
+          { text: "2. The question paper has 5 questions." },
+          { text: "3. Marks are indicated against each question." },
+          { text: "4. Answer in brief and to the point." },
+          { text: "5. List the components of blood." },
+        ],
+      ]);
+      const questions = extractQuestions(doc);
+      expect(questions.map((q) => q.number)).toEqual(["1", "5"]);
+    });
+
     it("ignores numbered 'read the following' instruction", () => {
       const doc = makeDoc([
         [

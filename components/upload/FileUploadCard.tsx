@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useCallback } from "react";
-import { Upload, X, AlertCircle } from "lucide-react";
+import { Upload, X, AlertCircle, FileImage } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UploadedFileMeta } from "@/types/mapping";
 
@@ -38,13 +38,15 @@ export default function FileUploadCard({
   const validate = useCallback(
     (f: File): UploadedFileMeta | string => {
       const ext = f.name.split(".").pop()?.toLowerCase();
-      if (f.type !== "application/pdf" && ext !== "pdf") {
-        return "Only PDF files are supported.";
+      const isPdf = f.type === "application/pdf" || ext === "pdf";
+      const isImage = f.type === "image/png" || f.type === "image/jpeg" || f.type === "image/jpg" || ["png", "jpeg", "jpg"].includes(ext ?? "");
+      if (!isPdf && !isImage) {
+        return "Only PDF, PNG, or JPEG files are supported.";
       }
       if (f.size > 4 * 1024 * 1024) {
         return "For production uploads, each file must be smaller than 4 MB.";
       }
-      const pages = Math.max(2, Math.round(f.size / (1024 * 1024)));
+      const pages = isPdf ? Math.max(2, Math.round(f.size / (1024 * 1024))) : 1;
       return { name: f.name, size: f.size, pages };
     },
     [],
@@ -70,10 +72,14 @@ export default function FileUploadCard({
       {file ? (
         <div className="relative flex w-full items-center gap-3 rounded-2xl border border-[--color-border] bg-white px-4 py-3.5 shadow-sm transition-all">
           <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-red-50">
-            <svg viewBox="0 0 24 24" className="size-5 text-red-500" fill="currentColor">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z" />
-              <text x="12" y="17" textAnchor="middle" fontSize="5" fontWeight="bold" fill="currentColor">PDF</text>
-            </svg>
+            {file.name.toLowerCase().endsWith(".pdf") ? (
+              <svg viewBox="0 0 24 24" className="size-5 text-red-500" fill="currentColor">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z" />
+                <text x="12" y="17" textAnchor="middle" fontSize="5" fontWeight="bold" fill="currentColor">PDF</text>
+              </svg>
+            ) : (
+              <FileImage className="size-5 text-red-500" />
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-foreground">
@@ -119,7 +125,7 @@ export default function FileUploadCard({
           <input
             ref={inputRef}
             type="file"
-            accept=".pdf,application/pdf"
+            accept=".pdf,application/pdf,image/png,image/jpeg,image/jpg"
             className="sr-only"
             aria-label={kind === "question" ? "Upload Question Paper" : "Upload Answer Sheet"}
             onChange={(e) => {
@@ -132,7 +138,7 @@ export default function FileUploadCard({
           </div>
           <div className="text-center">
             <p className="text-sm font-medium text-foreground">{label}</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">Max 4MB</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">PDF, PNG, or JPEG &middot; Max 4MB</p>
           </div>
         </label>
       )}

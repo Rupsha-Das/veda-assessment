@@ -16,11 +16,13 @@ import AnswerViewer from "./AnswerViewer";
 interface MappingWorkspaceProps {
   examData: ProcessExamResponse;
   answerSheetUrl: string;
+  isImage: boolean;
 }
 
 export default function MappingWorkspace({
   examData,
   answerSheetUrl,
+  isImage,
 }: MappingWorkspaceProps) {
   const [selectedNumber, setSelectedNumber] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
@@ -178,6 +180,7 @@ export default function MappingWorkspace({
             onZoomOut={handleZoomOut}
             setHighlightRef={setAnswerHighlightRef}
             totalPages={totalPages}
+            isImage={isImage}
           />
         </TabsContent>
       </Tabs>
@@ -224,6 +227,7 @@ export default function MappingWorkspace({
               onZoomOut={handleZoomOut}
               setHighlightRef={setAnswerHighlightRef}
               totalPages={totalPages}
+              isImage={isImage}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

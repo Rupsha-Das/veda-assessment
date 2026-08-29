@@ -54,8 +54,20 @@ export function isLikelyTopLevelQuestionBlock(
   const question = questions.find((item) => item.number === number);
   if (!question) return null;
 
+  // On answer sheets the question number is usually the strongest signal.
+  // Handwritten answers often paraphrase the question heavily, so requiring
+  // a large text overlap causes valid long answers to disappear. Keep the
+  // semantic check only as a guard for very short/ambiguous fragments.
   if (content.length >= 3) {
-    return hasQuestionTextOverlap(content, question.text) ? number : null;
+    if (hasQuestionTextOverlap(content, question.text)) return number;
+
+    const contentWords = normalizeWords(content);
+    const questionWords = normalizeWords(question.text);
+    const hasUsefulAnswerText = contentWords.size >= 3;
+    const hasTopicSignal = [...contentWords].some((word) => questionWords.has(word));
+
+    if (hasUsefulAnswerText && hasTopicSignal) return number;
+    return null;
   }
 
   if (content.length === 0) return number;

@@ -19,6 +19,7 @@ interface AnswerViewerProps {
   onZoomOut: () => void;
   setHighlightRef: (id: string, el: HTMLButtonElement | null) => void;
   totalPages: number;
+  isImage: boolean;
 }
 
 export default function AnswerViewer({
@@ -34,6 +35,7 @@ export default function AnswerViewer({
   onZoomOut,
   setHighlightRef,
   totalPages,
+  isImage,
 }: AnswerViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -87,8 +89,6 @@ export default function AnswerViewer({
   }, [answers, gradingByNumber, page, selectedNumber]);
 
   const hasSelection = selectedNumber !== null;
-
-  const isImage = answerSheetUrl.includes("image/");
 
   return (
     <div

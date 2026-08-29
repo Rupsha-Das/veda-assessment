@@ -246,6 +246,7 @@ export default function ExamsApp() {
           <MappingWorkspace
             examData={examData}
             answerSheetUrl={answerSheetUrl}
+            isImage={answerFile?.type?.startsWith("image/") ?? false}
           />
         )}
         {screen === "loading" && <ExtractionLoader onDone={() => {}} />}

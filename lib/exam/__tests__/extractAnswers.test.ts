@@ -135,6 +135,15 @@ describe("extractAnswers", () => {
       expect(result).toBe("2");
     });
 
+    it("keeps a long paraphrased answer when its marker matches", () => {
+      const block = makeBlock(
+        "p0-b0",
+        "2. Diffusion is the movement of particles from a region of higher concentration to a region of lower concentration until uniform distribution is achieved.",
+      );
+      const result = isLikelyTopLevelQuestionBlock(block.text, SAMPLE_QUESTIONS);
+      expect(result).toBe("2");
+    });
+
     it("returns null for non-matching number", () => {
       const block = makeBlock("p0-b0", "99. Some answer.");
       const result = isLikelyTopLevelQuestionBlock(block.text, SAMPLE_QUESTIONS);
