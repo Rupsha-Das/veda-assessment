@@ -167,6 +167,7 @@ export default function MappingWorkspace({
         >
           <AnswerViewer
             answers={examData.answers}
+            questions={examData.questions}
             answerSheetUrl={answerSheetUrl}
             selectedNumber={selectedQuestionNumber}
             onSelect={selectAnswerQuestion}
@@ -212,6 +213,7 @@ export default function MappingWorkspace({
           >
             <AnswerViewer
               answers={examData.answers}
+              questions={examData.questions}
               answerSheetUrl={answerSheetUrl}
               selectedNumber={selectedQuestionNumber}
               onSelect={selectAnswerQuestion}

@@ -2,12 +2,13 @@
 
 import { useRef, useState, useMemo, useCallback, useEffect } from "react";
 import type { ZoomLevel } from "@/types/mapping";
-import type { AnswerGroup, AnswerRegion } from "@/types/exam";
+import type { AnswerGroup, AnswerRegion, Question } from "@/types/exam";
 import AnswerToolbar from "./AnswerToolbar";
 import AnswerHighlight from "./AnswerHighlight";
 
 interface AnswerViewerProps {
   answers: AnswerGroup[];
+  questions: Question[];
   answerSheetUrl: string;
   selectedNumber: string | null;
   onSelect: (id: string) => void;
@@ -22,6 +23,7 @@ interface AnswerViewerProps {
 
 export default function AnswerViewer({
   answers,
+  questions,
   answerSheetUrl,
   selectedNumber,
   onSelect,
@@ -61,6 +63,14 @@ export default function AnswerViewer({
     return () => observer.disconnect();
   }, []);
 
+  const gradingByNumber = useMemo(() => {
+    const map = new Map<string, { marksObtained?: number; maxMarks?: number }>();
+    for (const q of questions) {
+      map.set(q.number, { marksObtained: q.marksObtained, maxMarks: q.maxMarks });
+    }
+    return map;
+  }, [questions]);
+
   const highlightsOnPage = useMemo(() => {
     if (selectedNumber === null) return [];
 
@@ -69,11 +79,12 @@ export default function AnswerViewer({
       answers.find((item) => item.questionNumber === selectedNumber) ??
       answers.find((item) => item.questionNumber === baseNumber);
     const region = answer?.regions.find((item) => item.pageIndex === page);
+    const grading = gradingByNumber.get(selectedNumber) ?? gradingByNumber.get(baseNumber);
 
     return region
-      ? [{ questionNumber: selectedNumber, region }]
+      ? [{ questionNumber: selectedNumber, region, marksObtained: grading?.marksObtained, maxMarks: grading?.maxMarks }]
       : [];
-  }, [answers, page, selectedNumber]);
+  }, [answers, gradingByNumber, page, selectedNumber]);
 
   const hasSelection = selectedNumber !== null;
 
@@ -152,7 +163,7 @@ function PdfPage({
   zoom: number;
   availableWidth: number;
   availableHeight: number;
-  highlights: { questionNumber: string; region: AnswerRegion }[];
+  highlights: { questionNumber: string; region: AnswerRegion; marksObtained?: number; maxMarks?: number }[];
   selectedNumber: string | null;
   hasSelection: boolean;
   onSelect: (id: string) => void;
@@ -227,6 +238,8 @@ function PdfPage({
               hasSelection={hasSelection}
               onSelect={() => onSelect(h.questionNumber)}
               setRef={(el) => setHighlightRef(h.questionNumber, el)}
+              marksObtained={h.marksObtained}
+              maxMarks={h.maxMarks}
             />
           ))}
         </div>
@@ -252,7 +265,7 @@ function ImagePage({
   zoom: number;
   availableWidth: number;
   availableHeight: number;
-  highlights: { questionNumber: string; region: AnswerRegion }[];
+  highlights: { questionNumber: string; region: AnswerRegion; marksObtained?: number; maxMarks?: number }[];
   selectedNumber: string | null;
   hasSelection: boolean;
   onSelect: (id: string) => void;
@@ -301,6 +314,8 @@ function ImagePage({
               hasSelection={hasSelection}
               onSelect={() => onSelect(h.questionNumber)}
               setRef={(el) => setHighlightRef(h.questionNumber, el)}
+              marksObtained={h.marksObtained}
+              maxMarks={h.maxMarks}
             />
           ))}
         </div>

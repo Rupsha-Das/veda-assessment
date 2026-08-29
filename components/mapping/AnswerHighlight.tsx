@@ -3,19 +3,54 @@
 import { cn } from "@/lib/utils";
 import type { AnswerRegion } from "@/types/exam";
 
-const COLORS = [
-  { border: "border-emerald-500/60", bg: "bg-emerald-400/20", selectedBorder: "border-emerald-500", selectedBg: "bg-emerald-400/35", ring: "ring-emerald-500/30", badge: "bg-emerald-500" },
-  { border: "border-orange-500/60", bg: "bg-orange-400/20", selectedBorder: "border-orange-500", selectedBg: "bg-orange-400/35", ring: "ring-orange-500/30", badge: "bg-orange-500" },
-  { border: "border-blue-500/60", bg: "bg-blue-400/20", selectedBorder: "border-blue-500", selectedBg: "bg-blue-400/35", ring: "ring-blue-500/30", badge: "bg-blue-500" },
-  { border: "border-purple-500/60", bg: "bg-purple-400/20", selectedBorder: "border-purple-500", selectedBg: "bg-purple-400/35", ring: "ring-purple-500/30", badge: "bg-purple-500" },
-  { border: "border-pink-500/60", bg: "bg-pink-400/20", selectedBorder: "border-pink-500", selectedBg: "bg-pink-400/35", ring: "ring-pink-500/30", badge: "bg-pink-500" },
-  { border: "border-teal-500/60", bg: "bg-teal-400/20", selectedBorder: "border-teal-500", selectedBg: "bg-teal-400/35", ring: "ring-teal-500/30", badge: "bg-teal-500" },
-];
+type HighlightStatus = "correct" | "partial" | "incorrect";
 
-function getColor(num: string) {
-  const n = parseInt(num, 10) || 0;
-  return COLORS[n % COLORS.length];
+function getAnswerHighlightStatus(
+  marksObtained: number | undefined,
+  maxMarks: number | undefined,
+): HighlightStatus {
+  if (marksObtained === undefined || maxMarks === undefined) return "incorrect";
+  if (marksObtained === 0) return "incorrect";
+  if (marksObtained >= maxMarks) return "correct";
+  return "partial";
 }
+
+const STATUS_STYLES: Record<
+  HighlightStatus,
+  {
+    border: string;
+    bg: string;
+    selectedBorder: string;
+    selectedBg: string;
+    ring: string;
+    badge: string;
+  }
+> = {
+  correct: {
+    border: "border-green-500/60",
+    bg: "bg-green-400/20",
+    selectedBorder: "border-green-500",
+    selectedBg: "bg-green-400/35",
+    ring: "ring-green-500/30",
+    badge: "bg-green-500",
+  },
+  partial: {
+    border: "border-orange-500/60",
+    bg: "bg-orange-400/20",
+    selectedBorder: "border-orange-500",
+    selectedBg: "bg-orange-400/35",
+    ring: "ring-orange-500/30",
+    badge: "bg-orange-500",
+  },
+  incorrect: {
+    border: "border-red-500/60",
+    bg: "bg-red-400/20",
+    selectedBorder: "border-red-500",
+    selectedBg: "bg-red-400/35",
+    ring: "ring-red-500/30",
+    badge: "bg-red-500",
+  },
+};
 
 interface AnswerHighlightProps {
   questionNumber: string;
@@ -24,6 +59,8 @@ interface AnswerHighlightProps {
   hasSelection: boolean;
   onSelect: () => void;
   setRef: (el: HTMLButtonElement | null) => void;
+  marksObtained?: number;
+  maxMarks?: number;
 }
 
 export default function AnswerHighlight({
@@ -33,8 +70,11 @@ export default function AnswerHighlight({
   hasSelection,
   onSelect,
   setRef,
+  marksObtained,
+  maxMarks,
 }: AnswerHighlightProps) {
-  const color = getColor(questionNumber);
+  const status = getAnswerHighlightStatus(marksObtained, maxMarks);
+  const color = STATUS_STYLES[status];
   const { box } = region;
 
   return (
