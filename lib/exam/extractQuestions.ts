@@ -19,6 +19,7 @@ const STANDALONE_SUB_PART_RE =
 const INSTRUCTION_PATTERNS = [
   /^\s*answer\s+all\s+questions?\b/i,
   /^\s*answer\s+(?:any|both|one|two|three|four|five|six|seven|eight|nine|ten)\s+questions?\b/i,
+  /^\s*answer\s+the\s+following\b/i,
   /^\s*(?:do\s+not|please\s+|kindly\s+) write\b/i,
   /^\s*write\s+(?:your|neatly|in\s+neat|with\s+(?:black|blue|dark))\b/i,
   /^\s*(?:use|pen|pencil)\s+(?:black|blue|dark)\b/i,
@@ -26,6 +27,17 @@ const INSTRUCTION_PATTERNS = [
   /^\s*(?:fill\s+in|mark\s+the|tick\s+the|choose\s+the|select\s+the|circle\s+the)\b/i,
   /^\s*(?:all\s+questions?\s+are\s+(?:compulsory|mandatory))\b/i,
   /^\s*(?:attempt\s+(?:all|any|both))\b/i,
+  /^\s*(?:solve\s+(?:the\s+)?(?:following|any))\b/i,
+  /^\s*(?:show\s+your\s+calculations)\b/i,
+  /^\s*(?:justify\s+your)\b/i,
+  /^\s*(?:give\s+reasons)\b/i,
+  /^\s*(?:read\s+the\s+following)\b/i,
+  /^\s*(?:internal\s+choices?\s+(?:are|is)\s+provided)\b/i,
+  /^\s*(?:use\s+the\s+following)\b/i,
+  /^\s*(?:refer\s+to\s+the)\b/i,
+  /^\s*(?:just\s+write|write\s+only)\b/i,
+  /^\s*(?:note\s*:?)\b/i,
+  /^\s*(?:important\s*:?)\b/i,
 ];
 
 const SECTION_HEADING_PATTERNS = [
@@ -48,13 +60,17 @@ const METADATA_PATTERNS = [
 
 const SECTION_MARKER_RE = /^##\s*/;
 
+function stripNumberPrefix(text: string): string {
+  return text
+    .replace(/^\s*(?:question\s+|q\.?\s*)?\d{1,3}\s*[.):\-]?\s*/i, "")
+    .replace(/^\s*\(?[a-z]{1,3}\)?\s*[.):\-]\s*/i, "")
+    .trim();
+}
+
 function classifyLine(text: string): "instruction" | "section_heading" | "metadata" | "marks_info" | "content" {
   const trimmed = text.trim();
   if (trimmed.length === 0) return "content";
 
-  for (const p of INSTRUCTION_PATTERNS) {
-    if (p.test(trimmed)) return "instruction";
-  }
   for (const p of SECTION_HEADING_PATTERNS) {
     if (p.test(trimmed)) return "section_heading";
   }
@@ -66,6 +82,11 @@ function classifyLine(text: string): "instruction" | "section_heading" | "metada
   if (/^\s*\*{2}.*\*{2}\s*$/.test(trimmed)) return "metadata";
   if (/^\s*\d{1,3}\s*marks?\s*$/i.test(trimmed)) return "marks_info";
   if (/^\s*\d{1,3}\s*[×x]\s*\d{1,3}\s*=\s*\d{1,3}\s*$/.test(trimmed)) return "marks_info";
+
+  const stripped = stripNumberPrefix(trimmed);
+  for (const p of INSTRUCTION_PATTERNS) {
+    if (p.test(stripped)) return "instruction";
+  }
 
   return "content";
 }
@@ -171,20 +192,35 @@ function detectQuestionCandidates(lines: TextLine[]): QuestionCandidate[] {
     const classification = classifyLine(line.text);
 
     if (classification !== "content") {
-      if (current) {
-        if (
-          classification === "section_heading" ||
-          classification === "instruction" ||
-          classification === "metadata" ||
-          classification === "marks_info"
-        ) {
-          if (current.lines.length > 0) {
-            candidates.push(current);
+      if (classification !== "instruction") {
+        if (current) {
+          if (
+            classification === "section_heading" ||
+            classification === "metadata" ||
+            classification === "marks_info"
+          ) {
+            if (current.lines.length > 0) {
+              candidates.push(current);
+            }
+            current = null;
           }
-          current = null;
-        } else {
-          current.lines.push(line);
         }
+      }
+      const parsed = parseQuestionNumber(line.text);
+      if (parsed && parsed.kind === "number") {
+        lastParentNumber = parsed.number;
+        lastParentLineIndex = i;
+        if (current && current.lines.length > 0) {
+          candidates.push(current);
+        }
+        current = null;
+      } else if (parsed && parsed.kind === "sub_part") {
+        lastParentNumber = parsed.number;
+        lastParentLineIndex = i;
+        if (current && current.lines.length > 0) {
+          candidates.push(current);
+        }
+        current = null;
       }
       continue;
     }

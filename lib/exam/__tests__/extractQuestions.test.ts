@@ -93,6 +93,88 @@ describe("extractQuestions", () => {
       expect(questions.length).toBe(1);
       expect(questions[0].number).toBe("1");
     });
+
+    it("ignores numbered instruction '1. Answer all questions'", () => {
+      const doc = makeDoc([
+        [
+          { text: "1. Answer all questions." },
+          { text: "2. What is photosynthesis?" },
+          { text: "3. Define mitosis." },
+        ],
+      ]);
+      const questions = extractQuestions(doc);
+      const numbers = questions.map((q) => q.number);
+      expect(numbers).not.toContain("1");
+      expect(numbers).toContain("2");
+      expect(numbers).toContain("3");
+    });
+
+    it("ignores numbered instruction '2. Draw neat and labelled diagrams'", () => {
+      const doc = makeDoc([
+        [
+          { text: "1. What is DNA?" },
+          { text: "2. Draw neat and labelled diagrams wherever required." },
+          { text: "3. Define mitosis." },
+        ],
+      ]);
+      const questions = extractQuestions(doc);
+      const numbers = questions.map((q) => q.number);
+      expect(numbers).toContain("1");
+      expect(numbers).not.toContain("2");
+      expect(numbers).toContain("3");
+    });
+
+    it("ignores container instruction '11. Answer the following:' but keeps sub-parts", () => {
+      const doc = makeDoc([
+        [
+          { text: "11. Answer the following:" },
+          { text: "(a). Explain diffusion." },
+          { text: "(b). Explain osmosis." },
+        ],
+      ]);
+      const questions = extractQuestions(doc);
+      const numbers = questions.map((q) => q.number);
+      expect(numbers).not.toContain("11");
+      expect(numbers).toContain("11(a)");
+      expect(numbers).toContain("11(b)");
+    });
+
+    it("ignores numbered instruction with no question number following", () => {
+      const doc = makeDoc([
+        [
+          { text: "1. Answer all questions." },
+          { text: "2. Attempt all questions." },
+        ],
+      ]);
+      const questions = extractQuestions(doc);
+      expect(questions.length).toBe(0);
+    });
+
+    it("ignores numbered 'solve the following' instruction", () => {
+      const doc = makeDoc([
+        [
+          { text: "1. Solve the following:" },
+          { text: "2. What is gravity?" },
+        ],
+      ]);
+      const questions = extractQuestions(doc);
+      const numbers = questions.map((q) => q.number);
+      expect(numbers).not.toContain("1");
+      expect(numbers).toContain("2");
+    });
+
+    it("ignores numbered 'read the following' instruction", () => {
+      const doc = makeDoc([
+        [
+          { text: "1. Read the following passage and answer." },
+          { text: "2. What is photosynthesis?" },
+        ],
+      ]);
+      const questions = extractQuestions(doc);
+      const numbers = questions.map((q) => q.number);
+      expect(numbers).not.toContain("1");
+      expect(numbers).toContain("2");
+    });
   });
 
   describe("section headings are ignored", () => {
