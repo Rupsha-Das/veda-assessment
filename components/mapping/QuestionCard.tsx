@@ -69,7 +69,7 @@ export default function QuestionCard({
             isSelected && "bg-[#ff633d] text-white ring-2 ring-[#ff633d]/20 ring-offset-1",
           )}
         >
-          {question.number}
+          {question.displayNumber ?? question.number}
         </div>
 
         <div className="min-w-0 flex-1">

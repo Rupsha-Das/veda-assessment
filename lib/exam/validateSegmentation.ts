@@ -7,6 +7,11 @@ import {
   detectBareAnswerNumber,
 } from "./extractAnswers";
 
+function normalizeAnswerNumber(value: string): string {
+  const match = value.trim().match(/^(?:q(?:uestion)?\s*)?(\d{1,3})/i);
+  return match?.[1] ?? value.trim().replace(/[.):\-]+$/, "");
+}
+
 export type ValidatedSegmentation = {
   answers: AnswerAssociation[];
   unassignedBlockIds: string[];
@@ -36,7 +41,8 @@ export function validateSegmentation({
   const validatedAnswers: AnswerAssociation[] = [];
 
   for (const answer of segmentation.answers) {
-    const answerBaseNumber = answer.questionNumber.match(/^(\d{1,3})/)?.[1] ?? answer.questionNumber;
+    const normalizedNumber = normalizeAnswerNumber(answer.questionNumber);
+    const answerBaseNumber = normalizedNumber.match(/^(\d{1,3})/)?.[1] ?? normalizedNumber;
     const isValidQuestion =
       validQuestionNumbers.has(answer.questionNumber) ||
       validBaseNumbers.has(answerBaseNumber);
@@ -94,7 +100,7 @@ export function validateSegmentation({
 
     if (validIds.length > 0) {
       validatedAnswers.push({
-        questionNumber: answer.questionNumber,
+        questionNumber: normalizedNumber,
         blockIds: validIds,
         confidence: answer.confidence,
       });

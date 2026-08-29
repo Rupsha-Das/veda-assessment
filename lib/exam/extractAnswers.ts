@@ -157,7 +157,29 @@ export function flattenAnswerBlocks(doc: OCRDocument): OCRBlock[] {
   for (const page of doc.pages) {
     for (const block of page.blocks) {
       if (IGNORED_TYPES.has(block.type)) continue;
-      blocks.push(block);
+
+      // OCR providers often return a whole handwritten paragraph as one
+      // block. Splitting it gives each numbered answer a usable highlight box
+      // instead of making the first answer own the entire paragraph.
+      const lines = block.text.split(/\r?\n/).filter((line) => line.trim());
+      if (lines.length <= 1) {
+        blocks.push(block);
+        continue;
+      }
+
+      const lineHeight = block.box.height / lines.length;
+      lines.forEach((text, index) => {
+        blocks.push({
+          ...block,
+          id: `${block.id}-line-${index}`,
+          text,
+          box: {
+            ...block.box,
+            y: block.box.y + lineHeight * index,
+            height: lineHeight,
+          },
+        });
+      });
     }
   }
   return blocks;

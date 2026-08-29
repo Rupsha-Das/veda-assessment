@@ -1,4 +1,5 @@
 import type { OCRDocument, OCRBlock, Question } from "@/types/exam";
+import { normalizeQuestionList } from "./normalizeQuestions";
 
 // ─── Question number patterns ───────────────────────────────────────────────
 
@@ -450,7 +451,7 @@ export function extractQuestions(doc: OCRDocument): Question[] {
     });
   }
 
-  return questions;
+  return normalizeQuestionList(questions);
 }
 
 // ─── Public helper for answer segmentation compatibility ────────────────────

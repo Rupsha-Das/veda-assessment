@@ -15,6 +15,7 @@ import {
   saveDraftMetadata,
   saveExamSession,
 } from "@/lib/exam/examSession";
+import { normalizeQuestionList } from "@/lib/exam/normalizeQuestions";
 
 export default function ExamsApp() {
   const [screen, setScreen] = useState<"upload" | "loading" | "mapping">("upload");
@@ -48,7 +49,10 @@ export default function ExamsApp() {
           setQuestionFile(session.questionFile);
           setAnswerFile(session.answerFile);
           if (session.examData && session.answerFile) {
-            setExamData(session.examData);
+            setExamData({
+              ...session.examData,
+              questions: normalizeQuestionList(session.examData.questions),
+            });
             setAnswerSheetUrl(URL.createObjectURL(session.answerFile));
             setScreen("mapping");
           }

@@ -124,7 +124,7 @@ describe("extractQuestions", () => {
       expect(numbers).toContain("3");
     });
 
-    it("ignores container instruction '11. Answer the following:' but keeps sub-parts", () => {
+    it("ignores container instruction and merges its sub-parts", () => {
       const doc = makeDoc([
         [
           { text: "11. Answer the following:" },
@@ -134,9 +134,9 @@ describe("extractQuestions", () => {
       ]);
       const questions = extractQuestions(doc);
       const numbers = questions.map((q) => q.number);
-      expect(numbers).not.toContain("11");
-      expect(numbers).toContain("11(a)");
-      expect(numbers).toContain("11(b)");
+      expect(numbers).toEqual(["11"]);
+      expect(questions[0].text).toContain("Explain diffusion");
+      expect(questions[0].text).toContain("Explain osmosis");
     });
 
     it("ignores numbered instruction with no question number following", () => {
@@ -335,7 +335,7 @@ describe("extractQuestions", () => {
   });
 
   describe("sub-part detection", () => {
-    it("detects sub-parts like 11(a) and 11(b)", () => {
+    it("merges lettered sub-parts into one question", () => {
       const doc = makeDoc([
         [
           { text: "11(a). Explain diffusion." },
@@ -344,11 +344,12 @@ describe("extractQuestions", () => {
       ]);
       const questions = extractQuestions(doc);
       const numbers = questions.map((q) => q.number);
-      expect(numbers).toContain("11(a)");
-      expect(numbers).toContain("11(b)");
+      expect(numbers).toEqual(["11"]);
+      expect(questions[0].text).toContain("Explain diffusion");
+      expect(questions[0].text).toContain("Explain osmosis");
     });
 
-    it("detects standalone sub-parts (a), (b)", () => {
+    it("merges standalone sub-parts into one question", () => {
       const doc = makeDoc([
         [
           { text: "11. Answer the following:" },
@@ -358,11 +359,12 @@ describe("extractQuestions", () => {
       ]);
       const questions = extractQuestions(doc);
       const numbers = questions.map((q) => q.number);
-      expect(numbers).toContain("11(a)");
-      expect(numbers).toContain("11(b)");
+      expect(numbers).toEqual(["11"]);
+      expect(questions[0].text).toContain("Explain diffusion");
+      expect(questions[0].text).toContain("Explain osmosis");
     });
 
-    it("detects numeric sub-parts (i), (ii)", () => {
+    it("merges numeric sub-parts into one question", () => {
       const doc = makeDoc([
         [
           { text: "11. Define:" },
@@ -372,11 +374,12 @@ describe("extractQuestions", () => {
       ]);
       const questions = extractQuestions(doc);
       const numbers = questions.map((q) => q.number);
-      expect(numbers).toContain("11(i)");
-      expect(numbers).toContain("11(ii)");
+      expect(numbers).toEqual(["11"]);
+      expect(questions[0].text).toContain("Osmosis");
+      expect(questions[0].text).toContain("Diffusion");
     });
 
-    it("sub-parts are separate questions", () => {
+    it("does not produce duplicate cards for sub-parts", () => {
       const doc = makeDoc([
         [
           { text: "11(a). Photosynthesis" },
@@ -384,8 +387,8 @@ describe("extractQuestions", () => {
         ],
       ]);
       const questions = extractQuestions(doc);
-      expect(questions.length).toBe(2);
-      expect(questions[0].number).not.toBe(questions[1].number);
+      expect(questions.length).toBe(1);
+      expect(questions[0].number).toBe("11");
     });
   });
 

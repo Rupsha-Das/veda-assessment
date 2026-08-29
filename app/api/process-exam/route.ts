@@ -9,6 +9,7 @@ import {
   buildAnswerGroups,
 } from "@/lib/exam/validateSegmentation";
 import type { OCRDocument, ProcessExamResponse } from "@/types/exam";
+import { normalizeQuestionList } from "@/lib/exam/normalizeQuestions";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Both OCR documents are required." }, { status: 400 });
     }
 
-    const questions = extractQuestions(questionOCR);
+    const questions = normalizeQuestionList(extractQuestions(questionOCR));
     const orderedBlocks = flattenAnswerBlocks(answerOCR);
 
     console.log(`[process-exam] Extracted ${questions.length} questions:`, questions.map((q) => q.number));
@@ -49,6 +50,20 @@ export async function POST(request: NextRequest) {
           questions,
           blocks: orderedBlocks,
         });
+
+        // A model response can be schema-valid while still missing obvious
+        // numbered answers. Compare it with the deterministic matcher and
+        // keep whichever result identifies more answer groups.
+        const deterministic = segmentAnswersDeterministically({
+          questions,
+          blocks: orderedBlocks,
+        });
+        if (deterministic.answers.length > segmentation.answers.length) {
+          console.warn(
+            `[process-exam] Deterministic matching found more answers (${deterministic.answers.length} vs ${segmentation.answers.length}); using deterministic result`,
+          );
+          segmentation = deterministic;
+        }
         console.log(`[process-exam] OpenRouter segmentation succeeded: ${segmentation.answers.length} answer groups`);
       } catch (error: unknown) {
         console.error("[process-exam] OpenRouter segmentation failed, falling back to deterministic:", error);

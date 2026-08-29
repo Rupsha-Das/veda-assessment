@@ -53,6 +53,7 @@ export type OCRDocument = {
 export type Question = {
   id: string;
   number: string;
+  displayNumber?: string;
   text: string;
   page?: number;
   maxMarks?: number;

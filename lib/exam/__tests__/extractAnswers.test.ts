@@ -82,6 +82,26 @@ describe("extractAnswers", () => {
       expect(blocks.length).toBe(1);
       expect(blocks[0].text).toBe("Content");
     });
+
+    it("splits multiline OCR blocks into line-level highlight regions", () => {
+      const doc: OCRDocument = {
+        pages: [{
+          pageIndex: 0,
+          width: 800,
+          height: 1100,
+          blocks: [makeBlock("p0-b0", "1. First answer\n2. Second answer", 0, 0.1, 0.2, 0.8, 0.2)],
+        }],
+      };
+      const blocks = flattenAnswerBlocks(doc);
+
+      expect(blocks.map((block) => block.text)).toEqual([
+        "1. First answer",
+        "2. Second answer",
+      ]);
+      expect(blocks[0].box.y).toBeCloseTo(0.2);
+      expect(blocks[1].box.y).toBeCloseTo(0.3);
+      expect(blocks[0].box.height).toBeCloseTo(0.1);
+    });
   });
 
   describe("detectMarkerHint", () => {
