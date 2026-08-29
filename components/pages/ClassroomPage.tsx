@@ -4,7 +4,6 @@ import {
   Presentation,
   Users,
   Plus,
-  Search,
   MoreHorizontal,
   BookOpen,
   FileCheck,
@@ -157,58 +156,8 @@ export default function ClassroomPage() {
         </section>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          {/* Students */}
-          <section className="lg:col-span-2">
-            <div className="rounded-xl border border-[--color-border] bg-white shadow-sm">
-              <div className="flex flex-col gap-3 border-b border-[--color-border] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="font-heading text-sm font-semibold text-foreground">
-                  Recent performance
-                </h2>
-                <div className="relative">
-                  <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder="Search students"
-                    className="h-8 w-full rounded-lg border border-[--color-border] bg-background pl-8 pr-3 text-sm text-foreground outline-none focus:border-[#ff633d] focus:ring-2 focus:ring-[#ff633d]/20 sm:w-56"
-                  />
-                </div>
-              </div>
-              <div className="divide-y divide-[--color-border]">
-                {STUDENTS.map((s) => (
-                  <div
-                    key={s.name}
-                    className="flex items-center gap-3 px-4 py-2.5"
-                  >
-                    <InitialsAvatar
-                      name={s.name}
-                      color="#ff633d"
-                      soft="#fff1ec"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-foreground">
-                        {s.name}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {s.section}
-                      </p>
-                    </div>
-                    {s.status === "graded" ? (
-                      <span className="text-sm font-semibold text-[#16a34a]">
-                        {s.score}
-                      </span>
-                    ) : (
-                      <Badge variant="outline" className="bg-[#fff4e5] text-[#ea580c]">
-                        Pending
-                      </Badge>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
           {/* Section summary */}
-          <section>
+          <section className="lg:col-span-2">
             <div className="rounded-xl border border-[--color-border] bg-white shadow-sm">
               <div className="border-b border-[--color-border] px-4 py-3">
                 <h2 className="font-heading text-sm font-semibold text-foreground">
@@ -246,6 +195,48 @@ export default function ClassroomPage() {
                   <Users className="size-4" />
                   Manage sections
                 </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Students */}
+          <section>
+            <div className="rounded-xl border border-[--color-border] bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-[--color-border] px-4 py-3">
+                <h2 className="font-heading text-sm font-semibold text-foreground">
+                  Recent performance
+                </h2>
+              </div>
+              <div className="divide-y divide-[--color-border]">
+                {STUDENTS.map((s) => (
+                  <div
+                    key={s.name}
+                    className="flex items-center gap-3 px-4 py-2.5"
+                  >
+                    <InitialsAvatar
+                      name={s.name}
+                      color="#ff633d"
+                      soft="#fff1ec"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">
+                        {s.name}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {s.section}
+                      </p>
+                    </div>
+                    {s.status === "graded" ? (
+                      <span className="text-sm font-semibold text-[#16a34a]">
+                        {s.score}
+                      </span>
+                    ) : (
+                      <Badge variant="outline" className="bg-[#fff4e5] text-[#ea580c]">
+                        Pending
+                      </Badge>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </section>
