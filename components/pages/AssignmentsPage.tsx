@@ -101,13 +101,13 @@ const STATUS_META: Record<
 export default function AssignmentsPage() {
   return (
     <AppPage title="Assignments" icon={ClipboardList}>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
-        <section className="animate-rise-in flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-3 sm:p-5 lg:p-6">
+        <section className="animate-rise-in flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-[28px]">
+            <h1 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               <span className="text-[#ff633d]">Assignments</span>
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-0.5 text-sm text-muted-foreground">
               3 open · 1 in grading · 2 graded
             </p>
           </div>
@@ -118,13 +118,13 @@ export default function AssignmentsPage() {
         </section>
 
         {/* Toolbar */}
-        <section className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <section className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search assignments"
-              className="h-10 w-full rounded-xl border border-[--color-border] bg-white pl-10 pr-3 text-sm text-foreground outline-none focus:border-[#ff633d] focus:ring-2 focus:ring-[#ff633d]/20"
+              className="h-9 w-full rounded-lg border border-[--color-border] bg-white pl-10 pr-3 text-sm text-foreground outline-none focus:border-[#ff633d] focus:ring-2 focus:ring-[#ff633d]/20"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -133,15 +133,15 @@ export default function AssignmentsPage() {
                 key={tab}
                 className={
                   tab === "All"
-                    ? "rounded-lg bg-[#292929] px-3 py-2 text-sm font-medium text-white"
-                    : "rounded-lg border border-[--color-border] bg-white px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    ? "rounded-lg bg-[#292929] px-3 py-1.5 text-sm font-medium text-white"
+                    : "rounded-lg border border-[--color-border] bg-white px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 }
               >
                 {tab}
               </button>
             ))}
             <button
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[--color-border] bg-white px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[--color-border] bg-white px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
               aria-label="Filter"
             >
               <Filter className="size-4" />
@@ -151,7 +151,7 @@ export default function AssignmentsPage() {
         </section>
 
         {/* Assignment list */}
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-2.5">
           {ASSIGNMENTS.map((a) => {
             const meta = STATUS_META[a.status];
             const Icon = meta.icon;
@@ -159,10 +159,10 @@ export default function AssignmentsPage() {
             return (
               <div
                 key={a.title}
-                className="group flex flex-col gap-4 rounded-2xl border border-[--color-border] bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:px-5"
+                className="group flex flex-col gap-2.5 rounded-xl border border-[--color-border] bg-white p-3.5 shadow-sm transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:px-4"
               >
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#fff1ec] text-[#ff633d]">
-                  <FileText className="size-5" />
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#fff1ec] text-[#ff633d]">
+                  <FileText className="size-4" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -178,7 +178,7 @@ export default function AssignmentsPage() {
                     {a.subject} · {a.section} · {a.due}
                   </p>
                 </div>
-                <div className="flex shrink-0 items-center gap-4 sm:w-52 sm:flex-col sm:items-end sm:gap-1">
+                <div className="flex shrink-0 items-center gap-4 sm:w-48 sm:flex-col sm:items-end sm:gap-1">
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                     <Users className="size-4" />
                     {a.submitted}/{a.total} submitted
@@ -190,7 +190,7 @@ export default function AssignmentsPage() {
                         style={{ width: `${pct}%` }}
                       />
                     </div>
-                    <span className="w-8 text-right text-xs font-medium text-foreground">
+                    <span className="w-7 text-right text-xs font-medium text-foreground">
                       {pct}%
                     </span>
                   </div>

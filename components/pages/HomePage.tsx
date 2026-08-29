@@ -113,31 +113,31 @@ const ACTIVITY_META: Record<
 export default function HomePage() {
   return (
     <AppPage title="Home" icon={GraduationCap}>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-3 sm:p-5 lg:p-6">
         {/* Greeting hero */}
         <section className="animate-rise-in">
-          <div className="relative overflow-hidden rounded-3xl bg-[#292929] p-6 text-white shadow-sm sm:p-8">
+          <div className="relative overflow-hidden rounded-2xl bg-[#292929] p-5 text-white shadow-sm sm:p-6">
             <div
-              className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-[#ff633d]/20 blur-2xl"
+              className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[#ff633d]/20 blur-2xl"
               aria-hidden="true"
             />
             <div
-              className="pointer-events-none absolute -bottom-20 right-24 size-40 rounded-full bg-[#ff633d]/10 blur-2xl"
+              className="pointer-events-none absolute -bottom-20 right-24 size-36 rounded-full bg-[#ff633d]/10 blur-2xl"
               aria-hidden="true"
             />
-            <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="max-w-xl">
                 <Badge
-                  className="mb-3 border-[#ff633d]/40 bg-[#ff633d]/15 text-[#ff633d]"
+                  className="mb-2 border-[#ff633d]/40 bg-[#ff633d]/15 text-[#ff633d]"
                   variant="outline"
                 >
                   <Sparkles className="size-3" />
                   Good morning, Madhur
                 </Badge>
-                <h1 className="font-heading text-2xl font-bold tracking-tight sm:text-3xl">
+                <h1 className="font-heading text-xl font-bold tracking-tight sm:text-2xl">
                   Welcome back to your classroom
                 </h1>
-                <p className="mt-2 text-sm text-white/70">
+                <p className="mt-1 text-sm text-white/70">
                   You have 3 assignments awaiting review and 1 exam ready to
                   map. Everything is right where you left it.
                 </p>
@@ -166,15 +166,15 @@ export default function HomePage() {
           {STATS.map((stat, i) => (
             <div
               key={stat.label}
-              className="animate-rise-in rounded-2xl border border-[--color-border] bg-white p-4 shadow-sm"
+              className="animate-rise-in rounded-xl border border-[--color-border] bg-white p-3 shadow-sm"
               style={{ animationDelay: `${i * 60}ms` }}
             >
               <div
-                className={`mb-3 flex size-10 items-center justify-center rounded-xl ${TONE_CLASSES[stat.tone]}`}
+                className={`mb-2 flex size-9 items-center justify-center rounded-lg ${TONE_CLASSES[stat.tone]}`}
               >
-                <stat.icon className="size-5" />
+                <stat.icon className="size-4" />
               </div>
-              <p className="text-2xl font-bold tracking-tight text-foreground">
+              <p className="text-xl font-bold tracking-tight text-foreground">
                 {stat.value}
               </p>
               <div className="mt-0.5 flex items-center gap-1.5">
@@ -182,7 +182,7 @@ export default function HomePage() {
                   <TrendingUp className="size-3" />
                   {stat.delta}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="truncate text-xs text-muted-foreground">
                   {stat.label}
                 </span>
               </div>
@@ -190,16 +190,16 @@ export default function HomePage() {
           ))}
         </section>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-3">
           {/* Quick actions */}
           <section className="lg:col-span-1">
-            <div className="rounded-2xl border border-[--color-border] bg-white shadow-sm">
-              <div className="flex items-center justify-between border-b border-[--color-border] px-5 py-4">
+            <div className="rounded-xl border border-[--color-border] bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-[--color-border] px-4 py-3">
                 <h2 className="font-heading text-sm font-semibold text-foreground">
                   Quick actions
                 </h2>
               </div>
-              <div className="flex flex-col gap-1 p-3">
+              <div className="flex flex-col gap-0.5 p-2">
                 {[
                   {
                     label: "Upload & map an exam",
@@ -229,9 +229,9 @@ export default function HomePage() {
                   <Link
                     key={action.label}
                     href={action.href}
-                    className="group flex items-center gap-3 rounded-xl px-2.5 py-2.5 transition-colors hover:bg-gray-50"
+                    className="group flex items-center gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-gray-50"
                   >
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#f7f7f7] text-[#ff633d]">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#f7f7f7] text-[#ff633d]">
                       <action.icon className="size-4" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -251,8 +251,8 @@ export default function HomePage() {
 
           {/* Recent activity */}
           <section className="lg:col-span-2">
-            <div className="rounded-2xl border border-[--color-border] bg-white shadow-sm">
-              <div className="flex items-center justify-between border-b border-[--color-border] px-5 py-4">
+            <div className="rounded-xl border border-[--color-border] bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-[--color-border] px-4 py-3">
                 <h2 className="font-heading text-sm font-semibold text-foreground">
                   Recent activity
                 </h2>
@@ -270,10 +270,10 @@ export default function HomePage() {
                   return (
                     <div
                       key={item.title}
-                      className="flex items-center gap-3 px-5 py-3.5"
+                      className="flex items-center gap-3 px-4 py-2.5"
                     >
                       <div
-                        className={`flex size-9 shrink-0 items-center justify-center rounded-full ${meta.className}`}
+                        className={`flex size-8 shrink-0 items-center justify-center rounded-full ${meta.className}`}
                       >
                         <Icon className="size-4" />
                       </div>

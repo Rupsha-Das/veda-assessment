@@ -80,13 +80,13 @@ const MATERIALS = [
 export default function LibraryPage() {
   return (
     <AppPage title="My Library" icon={BookOpen}>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
-        <section className="animate-rise-in flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 p-3 sm:p-5 lg:p-6">
+        <section className="animate-rise-in flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-[28px]">
+            <h1 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
               My <span className="text-[#ff633d]">Library</span>
             </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-0.5 text-sm text-muted-foreground">
               318 materials across 4 folders
             </p>
           </div>
@@ -97,18 +97,18 @@ export default function LibraryPage() {
         </section>
 
         {/* Folders */}
-        <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <section className="grid grid-cols-2 gap-3 sm:gap-3 lg:grid-cols-4">
           {FOLDERS.map((f, i) => (
             <button
               key={f.name}
-              className="group animate-rise-in flex items-center gap-3 rounded-2xl border border-[--color-border] bg-white p-4 text-left shadow-sm transition-all hover:shadow-md"
+              className="group animate-rise-in flex items-center gap-3 rounded-xl border border-[--color-border] bg-white p-3 text-left shadow-sm transition-all hover:shadow-md"
               style={{ animationDelay: `${i * 60}ms` }}
             >
               <span
-                className="flex size-10 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105"
+                className="flex size-9 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105"
                 style={{ backgroundColor: f.soft, color: f.color }}
               >
-                <Folder className="size-5" />
+                <Folder className="size-4" />
               </span>
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-foreground">
@@ -126,21 +126,21 @@ export default function LibraryPage() {
           <input
             type="text"
             placeholder="Search your library"
-            className="h-10 w-full rounded-xl border border-[--color-border] bg-white pl-10 pr-3 text-sm text-foreground outline-none focus:border-[#ff633d] focus:ring-2 focus:ring-[#ff633d]/20"
+            className="h-9 w-full rounded-lg border border-[--color-border] bg-white pl-10 pr-3 text-sm text-foreground outline-none focus:border-[#ff633d] focus:ring-2 focus:ring-[#ff633d]/20"
           />
         </section>
 
         {/* Materials grid */}
-        <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
           {MATERIALS.map((m, i) => (
             <div
               key={m.title}
-              className="group animate-rise-in flex flex-col rounded-2xl border border-[--color-border] bg-white p-4 shadow-sm transition-all hover:shadow-md"
+              className="group animate-rise-in flex flex-col rounded-xl border border-[--color-border] bg-white p-3.5 shadow-sm transition-all hover:shadow-md"
               style={{ animationDelay: `${i * 50}ms` }}
             >
               <div className="flex items-start justify-between">
                 <span
-                  className="flex size-11 items-center justify-center rounded-xl"
+                  className="flex size-10 items-center justify-center rounded-lg"
                   style={{ backgroundColor: m.soft, color: m.color }}
                 >
                   {iconForType(m.type)}
@@ -149,13 +149,13 @@ export default function LibraryPage() {
                   <Star className="size-4 fill-[#eab308] text-[#eab308]" />
                 )}
               </div>
-              <h3 className="mt-3 text-sm font-semibold text-foreground">
+              <h3 className="mt-2.5 text-sm font-semibold text-foreground">
                 {m.title}
               </h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
                 {m.folder} · {m.type} · {m.size}
               </p>
-              <div className="mt-3 flex items-center gap-2 border-t border-[--color-border] pt-3">
+              <div className="mt-2.5 flex items-center gap-2 border-t border-[--color-border] pt-2.5">
                 <Badge
                   variant="outline"
                   className="bg-[#f7f7f7] text-muted-foreground"
@@ -179,7 +179,7 @@ export default function LibraryPage() {
 }
 
 function iconForType(type: string) {
-  if (type === "Diagram") return <Layers className="size-5" />;
-  if (type === "Worksheet") return <Download className="size-5" />;
-  return <FileText className="size-5" />;
+  if (type === "Diagram") return <Layers className="size-4" />;
+  if (type === "Worksheet") return <Download className="size-4" />;
+  return <FileText className="size-4" />;
 }

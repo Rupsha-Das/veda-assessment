@@ -27,7 +27,7 @@ function Toggle({
   hint: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 py-3">
+    <div className="flex items-center justify-between gap-4 py-2.5">
       <div>
         <p className="text-sm font-medium text-foreground">{label}</p>
         <p className="text-xs text-muted-foreground">{hint}</p>
@@ -64,9 +64,9 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-[--color-border] bg-white shadow-sm">
-      <div className="flex items-center gap-3 border-b border-[--color-border] px-5 py-4">
-        <span className="flex size-9 items-center justify-center rounded-lg bg-[#fff1ec] text-[#ff633d]">
+    <section className="rounded-xl border border-[--color-border] bg-white shadow-sm">
+      <div className="flex items-center gap-3 border-b border-[--color-border] px-4 py-3">
+        <span className="flex size-8 items-center justify-center rounded-lg bg-[#fff1ec] text-[#ff633d]">
           {icon}
         </span>
         <div>
@@ -76,7 +76,7 @@ function SectionCard({
           <p className="text-xs text-muted-foreground">{desc}</p>
         </div>
       </div>
-      <div className="px-5 py-2">{children}</div>
+      <div className="px-4 py-1.5">{children}</div>
     </section>
   );
 }
@@ -89,12 +89,12 @@ function Field({
   value: string;
 }) {
   return (
-    <div className="flex flex-col gap-1.5 py-3">
+    <div className="flex flex-col gap-1.5 py-2.5">
       <label className="text-sm font-medium text-foreground">{label}</label>
       <input
         type="text"
         defaultValue={value}
-        className="h-10 rounded-lg border border-[--color-border] bg-background px-3 text-sm text-foreground outline-none focus:border-[#ff633d] focus:ring-2 focus:ring-[#ff633d]/20"
+        className="h-9 rounded-lg border border-[--color-border] bg-background px-3 text-sm text-foreground outline-none focus:border-[#ff633d] focus:ring-2 focus:ring-[#ff633d]/20"
       />
     </div>
   );
@@ -107,12 +107,12 @@ export default function SettingsPage() {
 
   return (
     <AppPage title="Settings" icon={Settings}>
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-3 sm:p-5 lg:p-6">
         <section className="animate-rise-in">
-          <h1 className="font-heading text-2xl font-bold tracking-tight text-foreground sm:text-[28px]">
+          <h1 className="font-heading text-xl font-bold tracking-tight text-foreground sm:text-2xl">
             <span className="text-[#ff633d]">Settings</span>
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Manage your profile, preferences, and notifications
           </p>
         </section>
@@ -123,9 +123,9 @@ export default function SettingsPage() {
           title="Profile"
           desc="Your personal and account details"
         >
-          <div className="flex items-center gap-4 py-4">
+          <div className="flex items-center gap-4 py-3">
             <div className="relative">
-              <span className="flex size-16 items-center justify-center rounded-2xl bg-[#292929] text-xl font-bold text-white">
+              <span className="flex size-14 items-center justify-center rounded-2xl bg-[#292929] text-lg font-bold text-white">
                 MR
               </span>
               <button
