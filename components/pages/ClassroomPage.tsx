@@ -67,8 +67,6 @@ const STUDENTS = [
   { name: "Aarav Sharma", section: "Class 9 · B", score: "92%", status: "graded" },
   { name: "Priya Verma", section: "Class 9 · B", score: "88%", status: "graded" },
   { name: "Rohan Gupta", section: "Class 9 · B", score: "—", status: "pending" },
-  { name: "Sneha Iyer", section: "Class 9 · B", score: "95%", status: "graded" },
-  { name: "Kabir Singh", section: "Class 9 · B", score: "—", status: "pending" },
 ];
 
 function InitialsAvatar({ name, color, soft }: { name: string; color: string; soft: string }) {
