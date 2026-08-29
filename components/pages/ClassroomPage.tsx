@@ -155,43 +155,43 @@ export default function ClassroomPage() {
           ))}
         </section>
 
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-2">
           {/* Section summary */}
-          <section className="lg:col-span-2">
-            <div className="rounded-xl border border-[--color-border] bg-white shadow-sm">
-              <div className="border-b border-[--color-border] px-4 py-3">
+          <section>
+            <div className="flex h-full flex-col rounded-xl border border-[--color-border] bg-white shadow-sm">
+              <div className="flex items-center border-b border-[--color-border] px-4 py-3">
                 <h2 className="font-heading text-sm font-semibold text-foreground">
                   Section overview
                 </h2>
               </div>
-              <div className="flex flex-col gap-2.5 p-3.5">
+              <div className="flex flex-1 flex-col gap-3 p-3.5">
                 <div className="flex items-center gap-3 rounded-lg bg-[#f7f7f7] p-2.5">
-                  <span className="flex size-8 items-center justify-center rounded-lg bg-[#fff1ec] text-[#ff633d]">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#fff1ec] text-[#ff633d]">
                     <FileCheck className="size-4" />
                   </span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-foreground">
                       Exams this week
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="truncate text-xs text-muted-foreground">
                       2 exams mapped with AI
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 rounded-lg bg-[#f7f7f7] p-2.5">
-                  <span className="flex size-8 items-center justify-center rounded-lg bg-[#e9f7ee] text-[#16a34a]">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#e9f7ee] text-[#16a34a]">
                     <ClipboardList className="size-4" />
                   </span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-foreground">
                       Assignments open
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="truncate text-xs text-muted-foreground">
                       3 tasks still accepting work
                     </p>
                   </div>
                 </div>
-                <button className="mt-0.5 inline-flex items-center justify-center gap-1.5 rounded-lg border border-[--color-border] bg-white px-3.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-gray-50">
+                <button className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-lg border border-[--color-border] bg-white px-3.5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-gray-50">
                   <Users className="size-4" />
                   Manage sections
                 </button>
@@ -201,17 +201,17 @@ export default function ClassroomPage() {
 
           {/* Students */}
           <section>
-            <div className="rounded-xl border border-[--color-border] bg-white shadow-sm">
-              <div className="flex items-center justify-between border-b border-[--color-border] px-4 py-3">
+            <div className="flex h-full flex-col rounded-xl border border-[--color-border] bg-white shadow-sm">
+              <div className="flex items-center border-b border-[--color-border] px-4 py-3">
                 <h2 className="font-heading text-sm font-semibold text-foreground">
                   Recent performance
                 </h2>
               </div>
-              <div className="divide-y divide-[--color-border]">
+              <div className="flex flex-1 flex-col divide-y divide-[--color-border]">
                 {STUDENTS.map((s) => (
                   <div
                     key={s.name}
-                    className="flex items-center gap-3 px-4 py-2.5"
+                    className="flex flex-1 items-center gap-3 px-4 py-2.5"
                   >
                     <InitialsAvatar
                       name={s.name}
